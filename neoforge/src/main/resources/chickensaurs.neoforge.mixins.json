@@ -1,0 +1,14 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "net.hyper_pigeon.chickensaurs.mixin",
+  "compatibilityLevel": "JAVA_21",
+  "mixins": [],
+  "client": [
+    "net.hyper_pigeon.chickensaurs.MixinMinecraft"
+  ],
+  "server": [],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}
