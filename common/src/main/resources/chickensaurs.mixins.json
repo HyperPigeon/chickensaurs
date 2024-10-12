@@ -6,7 +6,7 @@
   "compatibilityLevel": "JAVA_18",
   "mixins": [],
   "client": [
-    "net.hyper_pigeon.chickensaurs.MixinMinecraft"
+    "MixinMinecraft"
   ],
   "server": [],
   "injectors": {

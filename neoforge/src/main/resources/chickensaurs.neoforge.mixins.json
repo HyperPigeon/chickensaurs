@@ -5,7 +5,7 @@
   "compatibilityLevel": "JAVA_21",
   "mixins": [],
   "client": [
-    "net.hyper_pigeon.chickensaurs.MixinMinecraft"
+    "MixinTitleScreen"
   ],
   "server": [],
   "injectors": {
