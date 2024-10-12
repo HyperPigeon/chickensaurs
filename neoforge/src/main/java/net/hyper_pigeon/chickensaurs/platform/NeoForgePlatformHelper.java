@@ -2,6 +2,7 @@ package net.hyper_pigeon.chickensaurs.platform;
 
 import net.hyper_pigeon.chickensaurs.ChickensaursNeoForge;
 import net.hyper_pigeon.chickensaurs.platform.services.IPlatformHelper;
+import net.minecraft.core.Holder;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.entity.Entity;

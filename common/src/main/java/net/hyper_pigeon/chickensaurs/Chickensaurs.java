@@ -1,6 +1,7 @@
 package net.hyper_pigeon.chickensaurs;
 
 import net.hyper_pigeon.chickensaurs.platform.Services;
+import net.hyper_pigeon.chickensaurs.register.*;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.item.Items;
 
@@ -27,5 +28,11 @@ public class Chickensaurs {
 
             Constants.LOG.info("Hello to examplemod");
         }
+
+        BlockEntityRegistry.init();
+        BlockRegistry.init();
+        EntityRegistry.init();
+        ItemRegistry.init();
+        SoundRegistry.init();
     }
 }

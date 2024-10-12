@@ -3,6 +3,13 @@ plugins {
     id 'net.neoforged.moddev'
 }
 
+repositories {
+    maven {
+        name = "SmartBrainLib (SBL) Maven Repo"
+        url = "https://dl.cloudsmith.io/public/tslat/sbl/maven/"
+    }
+}
+
 neoForge {
     version = neoforge_version
     // Automatically enable neoforge AccessTransformers if the file exists
@@ -34,6 +41,10 @@ neoForge {
             sourceSet sourceSets.main
         }
     }
+}
+
+dependencies {
+    implementation "net.tslat.smartbrainlib:SmartBrainLib-neoforge-1.21.1:${project.sbl_version}"
 }
 
 sourceSets.main.resources { srcDir 'src/generated/resources' }
