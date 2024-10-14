@@ -227,7 +227,7 @@ public class Chickensaur extends TamableAnimal implements SmartBrainOwner<Chicke
     }
 
     public static AttributeSupplier.Builder createAttributes() {
-        return Mob.createMobAttributes().add(Attributes.MOVEMENT_SPEED, 0.40000001192092896).add(Attributes.MAX_HEALTH, 30.0).add(Attributes.ATTACK_DAMAGE, 8.0);
+        return Mob.createMobAttributes().add(Attributes.MOVEMENT_SPEED, 0.40000001192092896).add(Attributes.MAX_HEALTH, 30.0).add(Attributes.ATTACK_DAMAGE, 8.0).add(Attributes.ARMOR, 12F);
     }
 
 }
