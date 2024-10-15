@@ -1,0 +1,21 @@
+{
+  "variants": {
+    "": [
+      {
+        "model": "chickensaurs:block/chickensaur_egg"
+      },
+      {
+        "model": "chickensaurs:block/chickensaur_egg",
+        "y": 90
+      },
+      {
+        "model": "chickensaurs:block/chickensaur_egg",
+        "y": 180
+      },
+      {
+        "model": "chickensaurs:block/chickensaur_egg",
+        "y": 270
+      }
+    ]
+  }
+}
