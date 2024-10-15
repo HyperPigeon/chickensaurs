@@ -17,9 +17,12 @@ import net.minecraft.world.entity.ai.behavior.SetEntityLookTarget;
 import net.minecraft.world.entity.ai.navigation.PathNavigation;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.monster.AbstractSkeleton;
+import net.minecraft.world.entity.monster.Skeleton;
+import net.minecraft.world.entity.monster.WitherSkeleton;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.level.pathfinder.PathType;
@@ -223,7 +226,7 @@ public class Chickensaur extends TamableAnimal implements SmartBrainOwner<Chicke
         return BrainActivityGroup.fightTasks(
                 new InvalidateAttackTarget<>(), // Cancel fighting if the target is no longer valid
                 new SetWalkTargetToAttackTarget<>().speedMod((entity, target) -> 1.2F),      // Set the walk target to the attack target
-                new AnimatableMeleeAttack<>(10)); // Melee attack the target if close enough
+                new AnimatableMeleeAttack<>(5)); // Melee attack the target if close enough
     }
 
     public static AttributeSupplier.Builder createAttributes() {
