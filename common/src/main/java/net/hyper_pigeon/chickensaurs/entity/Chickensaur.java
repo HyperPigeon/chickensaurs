@@ -4,10 +4,12 @@ import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.hyper_pigeon.chickensaurs.Constants;
 import net.hyper_pigeon.chickensaurs.entity.ai.behavior.EatFoodInMainHand;
 import net.hyper_pigeon.chickensaurs.entity.ai.behavior.MoveToNearestVisibleWantedItem;
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.Vec3i;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
+import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
@@ -29,6 +31,8 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.level.pathfinder.PathType;
 import net.minecraft.world.phys.AABB;
@@ -199,6 +203,15 @@ public class Chickensaur extends TamableAnimal implements SmartBrainOwner<Chicke
             this.playSound(SoundEvents.ARMADILLO_BRUSH);
             return true;
         }
+    }
+
+    protected float getBlockSpeedFactor() {
+        BlockPos blockPos = this.getBlockPosBelowThatAffectsMyMovement();
+        BlockState blockState = this.level().getBlockState(blockPos);
+        if(blockState.is(BlockTags.SOUL_SPEED_BLOCKS)){
+            return 1.2F;
+        }
+        return super.getBlockSpeedFactor();
     }
 
     @Override
