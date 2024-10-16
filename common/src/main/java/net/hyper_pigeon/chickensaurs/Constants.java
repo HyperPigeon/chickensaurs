@@ -4,6 +4,7 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.item.Item;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -21,5 +22,8 @@ public class Constants {
 
 	private static final ResourceLocation GROUP_HUNT_ID =  ResourceLocation.parse("chickensaurs:chickensaur_group_hunt");
 	public static final TagKey<EntityType<?>> GROUP_HUNT = TagKey.create(Registries.ENTITY_TYPE, GROUP_HUNT_ID);
+
+	private static final ResourceLocation CHICKENSAUR_FOOD_ID = ResourceLocation.parse("chickensaurs:chickensaur_food");
+	public static final TagKey<Item> CHICKENSAUR_FOOD = TagKey.create(Registries.ITEM, CHICKENSAUR_FOOD_ID);
 
 }

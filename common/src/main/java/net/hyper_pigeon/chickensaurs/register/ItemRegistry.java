@@ -11,9 +11,9 @@ public final class ItemRegistry {
     public static final Supplier<BlockItem> CHICKENSAUR_EGG = registerItem("chickensaur_egg", () -> new BlockItem(BlockRegistry.CHICKENSAUR_EGG.get(), new Item.Properties()));
     public static final Supplier<CreativeModeTab> CHICKENSAURS_TAB = Services.PLATFORM.registerCreativeModeTab("chickensaurs_items", () -> Services.PLATFORM.newCreativeTabBuilder()
             .title(Component.translatable("itemGroup." + Constants.MOD_ID + ".chickensaurs_items"))
-            .icon(() -> new ItemStack(Items.EGG))
+            .icon(() -> new ItemStack(CHICKENSAUR_EGG.get()))
             .displayItems((enabledFeatures, entries) -> {
-
+                entries.accept(CHICKENSAUR_EGG.get());
             })
             .build());
 
