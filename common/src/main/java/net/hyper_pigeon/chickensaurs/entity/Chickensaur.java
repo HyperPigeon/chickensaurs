@@ -1,12 +1,14 @@
 package net.hyper_pigeon.chickensaurs.entity;
 
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
+import net.hyper_pigeon.chickensaurs.Constants;
 import net.hyper_pigeon.chickensaurs.entity.ai.behavior.EatFoodInMainHand;
 import net.hyper_pigeon.chickensaurs.entity.ai.behavior.MoveToNearestVisibleWantedItem;
 import net.minecraft.core.Vec3i;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
+import net.minecraft.tags.ItemTags;
 import net.minecraft.util.Mth;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.*;
@@ -140,8 +142,7 @@ public class Chickensaur extends TamableAnimal implements SmartBrainOwner<Chicke
 
 
     public boolean wantsToPickUp(ItemStack stack) {
-        Item item = stack.getItem();
-        return item.equals(Items.BONE) || item.equals(Items.BONE_BLOCK) || item.equals(Items.PORKCHOP);
+        return stack.is(Constants.CHICKENSAUR_FOOD);
     }
 
     public boolean canPickUpLoot() {
