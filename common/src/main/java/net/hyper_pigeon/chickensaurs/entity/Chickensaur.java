@@ -10,6 +10,8 @@ import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.util.Mth;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.ai.Brain;
@@ -21,6 +23,7 @@ import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.monster.AbstractSkeleton;
 import net.minecraft.world.entity.monster.Skeleton;
 import net.minecraft.world.entity.monster.WitherSkeleton;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -173,6 +176,29 @@ public class Chickensaur extends TamableAnimal implements SmartBrainOwner<Chicke
     protected AABB getAttackBoundingBox() {
         AABB aABB = super.getAttackBoundingBox();
         return aABB.inflate(0.5, 0.0, 0.5);
+    }
+
+    public InteractionResult mobInteract(Player pPlayer, InteractionHand pHand) {
+        ItemStack itemstack = pPlayer.getItemInHand(pHand);
+        if (itemstack.is(Items.BRUSH) && this.brushOffIronNuggets()) {
+            itemstack.hurtAndBreak(24, pPlayer, getSlotForHand(pHand));
+            return InteractionResult.sidedSuccess(this.level().isClientSide);
+        }
+        //we'll probably have to add a clause here that prevents the player from brushing the chickensaur if its aggressive (though it might be
+        //funny if we don't)
+
+        return super.mobInteract(pPlayer, pHand);
+    }
+
+    private boolean brushOffIronNuggets() {
+        if (this.isBaby()) {
+            return false;
+        } else {
+            this.spawnAtLocation(new ItemStack(Items.IRON_NUGGET));
+            this.gameEvent(GameEvent.ENTITY_INTERACT);
+            this.playSound(SoundEvents.ARMADILLO_BRUSH);
+            return true;
+        }
     }
 
     @Override
