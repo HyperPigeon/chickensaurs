@@ -1,0 +1,12 @@
+{
+  "type": "neoforge:add_spawns",
+  "biomes": "#chickensaurs:chickensaur_spawn_biomes",
+  "spawners": [
+    {
+      "type": "chickensaurs:chickensaur",
+      "weight": 150,
+      "minCount": 3,
+      "maxCount": 4
+    }
+  ]
+}

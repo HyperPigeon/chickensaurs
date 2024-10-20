@@ -26,7 +26,9 @@ public abstract class AbstractSkeletonMixin extends Monster {
         if(pSource.getEntity() instanceof Chickensaur && getHealth() <= (1/3)*getMaxHealth()){
             super.hurt(pSource, 1000.0F);
             return true;
+        } else {
+            return this.isInvulnerableTo(pSource) ? false : super.hurt(pSource, pAmount);
         }
-        return super.hurt(pSource,pAmount*1.2F);
+
     }
 }
