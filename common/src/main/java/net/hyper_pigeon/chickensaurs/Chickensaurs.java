@@ -3,6 +3,7 @@ package net.hyper_pigeon.chickensaurs;
 import net.hyper_pigeon.chickensaurs.platform.Services;
 import net.hyper_pigeon.chickensaurs.register.*;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.world.entity.SpawnPlacements;
 import net.minecraft.world.item.Items;
 
 // This class is part of the common project meaning it is shared between all supported loaders. Code written here can only
