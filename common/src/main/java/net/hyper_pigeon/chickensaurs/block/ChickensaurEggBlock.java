@@ -64,7 +64,7 @@ public class ChickensaurEggBlock extends Block {
                 pLevel.addFreshEntity(chickensaur);
             }
         } else {
-            pLevel.setBlock(pPos, pState.setValue(HATCH, this.getHatchLevel(pState) + 1), 2);
+            pLevel.setBlock(pPos, pState.setValue(HATCH, getHatchLevel(pState) + 1), 2);
         }
     }
 
