@@ -1,5 +1,6 @@
 package net.hyper_pigeon.chickensaurs;
 
+import net.hyper_pigeon.chickensaurs.entity.ai.memory_types.ChickensaurMemoryTypes;
 import net.hyper_pigeon.chickensaurs.platform.Services;
 import net.hyper_pigeon.chickensaurs.register.*;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -35,5 +36,6 @@ public class Chickensaurs {
         EntityRegistry.init();
         ItemRegistry.init();
         SoundRegistry.init();
+        ChickensaurMemoryTypes.init();
     }
 }

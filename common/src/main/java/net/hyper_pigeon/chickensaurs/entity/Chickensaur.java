@@ -3,12 +3,20 @@ package net.hyper_pigeon.chickensaurs.entity;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.hyper_pigeon.chickensaurs.Constants;
 import net.hyper_pigeon.chickensaurs.entity.ai.behavior.EatFoodInMainHand;
+import net.hyper_pigeon.chickensaurs.entity.ai.behavior.IntimidateLivingEntity;
 import net.hyper_pigeon.chickensaurs.entity.ai.behavior.MoveToNearestVisibleWantedItem;
+import net.hyper_pigeon.chickensaurs.register.EntityRegistry;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.core.Vec3i;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.network.syncher.EntityDataAccessor;
+import net.minecraft.network.syncher.EntityDataSerializers;
+import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
@@ -21,13 +29,13 @@ import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.monster.AbstractSkeleton;
-import net.minecraft.world.entity.monster.hoglin.HoglinAi;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.LevelReader;
+import net.minecraft.world.level.block.BaseFireBlock;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.gameevent.GameEvent;
@@ -51,6 +59,7 @@ import net.tslat.smartbrainlib.api.core.sensor.vanilla.HurtBySensor;
 import net.tslat.smartbrainlib.api.core.sensor.vanilla.NearbyLivingEntitySensor;
 import net.tslat.smartbrainlib.api.core.sensor.vanilla.NearbyPlayersSensor;
 import net.tslat.smartbrainlib.api.core.sensor.vanilla.NearestItemSensor;
+import net.tslat.smartbrainlib.util.EntityRetrievalUtil;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
@@ -66,10 +75,23 @@ public class Chickensaur extends TamableAnimal implements SmartBrainOwner<Chicke
 
     private static final Vec3i ITEM_PICKUP_RANGE_EXPANDER = new Vec3i(1,1,1);
 
+    private static final EntityDataAccessor<Boolean> INTIMIDATING = SynchedEntityData.defineId(Chickensaur.class, EntityDataSerializers.BOOLEAN);
+    private static final EntityDataAccessor<Integer> INTIMIDATING_TICKS = SynchedEntityData.defineId(Chickensaur.class, EntityDataSerializers.INT);
+
+    public final AnimationState walkAnimationState = new AnimationState();
+    public final AnimationState intimidateAnimationState = new AnimationState();
+
 
     public Chickensaur(EntityType<? extends TamableAnimal> pEntityType, Level pLevel) {
         super(pEntityType, pLevel);
         this.shedTime = this.random.nextInt(6000) + 6000;
+    }
+
+    @Override
+    protected void defineSynchedData(SynchedEntityData.Builder pBuilder) {
+        super.defineSynchedData(pBuilder);
+        pBuilder.define(INTIMIDATING,false);
+        pBuilder.define(INTIMIDATING_TICKS, 0);
     }
 
     @Override
@@ -108,6 +130,80 @@ public class Chickensaur extends TamableAnimal implements SmartBrainOwner<Chicke
             this.shedTime = this.random.nextInt(6000) + 6000;
         }
 
+        if(isIntimidating()) {
+            if(this.level().isClientSide) {
+                if(!intimidateAnimationState.isStarted()) {
+                    intimidateAnimationState.start(this.tickCount);
+                }
+                if(getIntimidatingTicks() > 20) {
+                    if(this.random.nextDouble() < 0.5) {
+                        level().addParticle(ParticleTypes.SOUL_FIRE_FLAME,
+                                this.getX() + this.random.nextDouble() / 5.0,
+                                this.getY(1.1),
+                                this.getZ() + this.random.nextDouble() / 5.0,
+                                (this.random.nextDouble() * (2) - 1) * 0.25,
+                                -this.random.nextDouble() * 0.25,
+                                (this.random.nextDouble() * (2) - 1) * 0.25);
+                    }
+                }
+            }
+
+            //as of right now, this code results in some weird behavior and might be too destructive.
+//            if(getIntimidatingTicks() > 40) {
+//                if(this.random.nextDouble() < 0.10) {
+//                    BlockPos blockPos = this.getBlockPosBelowThatAffectsMyMovement();
+//                    BlockPos fireBlockPos = new BlockPos(blockPos.getX() + this.random.nextIntBetweenInclusive(1,3), blockPos.getY(), blockPos.getZ() + this.random.nextIntBetweenInclusive(1,3));
+//                    if(BaseFireBlock.canBePlacedAt(level(), fireBlockPos, Direction.getRandom(this.random))) {
+//                        level().playSound(null,fireBlockPos,SoundEvents.FLINTANDSTEEL_USE, SoundSource.BLOCKS, 1.0F, level().getRandom().nextFloat() * 0.4F + 0.8F);
+//                        level().setBlockAndUpdate(fireBlockPos, BaseFireBlock.getState(level(), fireBlockPos));
+//                        level().gameEvent(null, GameEvent.BLOCK_PLACE, fireBlockPos);
+//                    }
+//                }
+//            }
+
+            incrementIntimidatingTicks();
+        }
+        else {
+            if(this.level().isClientSide) {
+                if(!isIntimidating() && intimidateAnimationState.isStarted()) {
+                    intimidateAnimationState.stop();
+                    setIntimidatingTicks(0);
+                }
+            }
+        }
+
+//        if(this.level().isClientSide) {
+//            if(isIntimidating()) {
+//                if(!intimidateAnimationState.isStarted()) {
+//                    intimidateAnimationState.start(this.tickCount);
+//                }
+//                if(getIntimidatingTicks() > 20) {
+//                    if(this.random.nextDouble() < 0.5) {
+//                        level().addParticle(ParticleTypes.SOUL_FIRE_FLAME,
+//                                this.getX() + this.random.nextDouble() / 5.0,
+//                                this.getY(1.1),
+//                                this.getZ() + this.random.nextDouble() / 5.0,
+//                                (this.random.nextDouble() * (2) - 1) * 0.25,
+//                                -this.random.nextDouble() * 0.25,
+//                                (this.random.nextDouble() * (2) - 1) * 0.25);
+//                    }
+//                }
+//                incrementIntimidatingTicks();
+//            }
+//            else if(!isIntimidating() && intimidateAnimationState.isStarted()) {
+//                intimidateAnimationState.stop();
+//                setIntimidatingTicks(0);
+//            }
+//        }
+//        if(getIntimidatingTicks() > 40) {
+//            if(this.random.nextDouble() < 0.30) {
+//                BlockPos blockPos = new BlockPos(getBlockX() + this.random.nextIntBetweenInclusive(1,3),getBlockY() + this.random.nextIntBetweenInclusive(1,3),getBlockZ() + this.random.nextIntBetweenInclusive(1,3));
+//                if(!level().getBlockState(blockPos).is(BlockTags.AIR)) {
+//                    BlockState blockstate = BaseFireBlock.getState(level(), blockPos);
+//                    level().setBlock(blockPos, blockstate, 11);
+//                }
+//            }
+//        }
     }
 
     protected boolean isFlapping() {
@@ -209,6 +305,40 @@ public class Chickensaur extends TamableAnimal implements SmartBrainOwner<Chicke
         return pLevel.getBlockState(pPos.below()).is(BlockTags.SOUL_SPEED_BLOCKS) ? 10.0F : 0.0F;
     }
 
+    public boolean hasNumbersAdvantaqe(LivingEntity potentialPrey) {
+        double hunterFollowRange = this.getAttributeValue(Attributes.FOLLOW_RANGE);
+        int numHunterAllies =  EntityRetrievalUtil.getEntities(this, hunterFollowRange, 10.0, hunterFollowRange, LivingEntity.class, (entity) -> entity.getType().equals(EntityRegistry.CHICKENSAUR.get())).size();
+        double preyFollowRange = this.getAttributeValue(Attributes.FOLLOW_RANGE);
+        int numPreyAllies = EntityRetrievalUtil.getEntities(this, hunterFollowRange, 10.0, preyFollowRange, LivingEntity.class, (entity) -> entity.getType().equals(potentialPrey.getType())).size();
+
+        if(numHunterAllies >= 3 && numHunterAllies > numPreyAllies) {
+            return true;
+        }
+        return false;
+    }
+
+
+    public void setIntimidating(boolean isIntimidating) {
+        this.entityData.set(INTIMIDATING, isIntimidating);
+    }
+
+    public boolean isIntimidating() {
+        return this.entityData.get(INTIMIDATING);
+    }
+
+    public void setIntimidatingTicks(int ticks) {
+        this.entityData.set(INTIMIDATING_TICKS, ticks);
+    }
+
+    public void incrementIntimidatingTicks() {
+        this.entityData.set(INTIMIDATING_TICKS,this.entityData.get(INTIMIDATING_TICKS)+1);
+    }
+
+    public int getIntimidatingTicks() {
+        return this.entityData.get(INTIMIDATING_TICKS);
+    }
+
+
 
 
     @Override
@@ -226,15 +356,13 @@ public class Chickensaur extends TamableAnimal implements SmartBrainOwner<Chicke
         return ObjectArrayList.of(
                 new NearbyPlayersSensor<>(),
                 new NearbyLivingEntitySensor<Chickensaur>().setRadius(32).setPredicate((target,entity) -> {
-                    if(target instanceof AbstractSkeleton) {
-                        return true;
-                    }
-                    return false;
+                    EntityType<?> entityType = target.getType();
+                    return entityType.is(Constants.HUNT) || entityType.is(Constants.GROUP_HUNT) || entityType.is(Constants.INTIMIDATE);
                 }),
                 new HurtBySensor<>(),
                 new GenericAttackTargetSensor<>(),
                 new NearestItemSensor<Chickensaur>().
-                        setRadius(16,16),
+                        setRadius(16,16).setPredicate(((itemEntity, chickensaur) -> isFood(itemEntity.getItem()))),
                 new NearbyBlocksSensor<>()
         );
     }
@@ -251,7 +379,22 @@ public class Chickensaur extends TamableAnimal implements SmartBrainOwner<Chicke
     public BrainActivityGroup<Chickensaur> getIdleTasks() { // These are the tasks that run when the mob isn't doing anything else (usually)
         return BrainActivityGroup.idleTasks(
                 new FirstApplicableBehaviour(
-                        new TargetOrRetaliate(),
+                        new TargetOrRetaliate().attackablePredicate(target -> {
+                                LivingEntity livingEntity = (LivingEntity) target;
+                                EntityType<?> entityType = livingEntity.getType();
+                                if(entityType.is(Constants.HUNT)) {
+                                    return true;
+                                }
+                                else if(entityType.is(Constants.INTIMIDATE) && this.distanceToSqr(livingEntity) < 4) {
+                                    return true;
+                                }
+                                else if(entityType.is(Constants.GROUP_HUNT)) {
+                                    return hasNumbersAdvantaqe(livingEntity);
+                                }
+                                return false;
+                            }
+                        ),
+                        new IntimidateLivingEntity().runFor((entity) -> 200),
                         new EatFoodInMainHand<>().runFor((entity) -> 150),
                         new MoveToNearestVisibleWantedItem()
                 )

@@ -7,7 +7,7 @@
   "mixins": [
     "AbstractSkeletonMixin",
     "SkeletonMixin",
-    "SoulFireBlockMixin",
+    "BaseFireBlockMixin",
     "WitherSkeletonMixin"
   ],
   "client": [
