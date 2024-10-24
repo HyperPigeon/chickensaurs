@@ -86,8 +86,8 @@ public class ChickensaurModel extends HierarchicalModel<Chickensaur> {
     @Override
     public void setupAnim(Chickensaur entity, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch) {
         this.root().getAllParts().forEach(ModelPart::resetPose);
-        this.animate(entity.walkAnimationState, ChickensaurAnimation.CHICKENSAUR_WALK, ageInTicks);
         this.animate(entity.intimidateAnimationState, ChickensaurAnimation.CHICKENSAUR_INTIMIDATE, ageInTicks);
+        this.animateWalk(ChickensaurAnimation.CHICKENSAUR_WALK, limbSwing, limbSwingAmount, 2F, 2F);
     }
 
     @Override
