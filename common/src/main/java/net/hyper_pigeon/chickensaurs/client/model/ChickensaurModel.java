@@ -3,7 +3,9 @@ package net.hyper_pigeon.chickensaurs.client.model;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.hyper_pigeon.chickensaurs.Constants;
+import net.hyper_pigeon.chickensaurs.client.animation.definitions.ChickensaurAnimation;
 import net.hyper_pigeon.chickensaurs.entity.Chickensaur;
+import net.minecraft.client.animation.definitions.FrogAnimation;
 import net.minecraft.client.model.HierarchicalModel;
 import net.minecraft.client.model.geom.ModelLayerLocation;
 import net.minecraft.client.model.geom.ModelPart;
@@ -83,7 +85,9 @@ public class ChickensaurModel extends HierarchicalModel<Chickensaur> {
 
     @Override
     public void setupAnim(Chickensaur entity, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch) {
-
+        this.root().getAllParts().forEach(ModelPart::resetPose);
+        this.animate(entity.walkAnimationState, ChickensaurAnimation.CHICKENSAUR_WALK, ageInTicks);
+        this.animate(entity.intimidateAnimationState, ChickensaurAnimation.CHICKENSAUR_INTIMIDATE, ageInTicks);
     }
 
     @Override
