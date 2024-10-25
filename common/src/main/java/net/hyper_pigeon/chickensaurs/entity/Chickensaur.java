@@ -47,6 +47,7 @@ import net.tslat.smartbrainlib.api.core.SmartBrainProvider;
 import net.tslat.smartbrainlib.api.core.behaviour.FirstApplicableBehaviour;
 import net.tslat.smartbrainlib.api.core.behaviour.custom.attack.AnimatableMeleeAttack;
 import net.tslat.smartbrainlib.api.core.behaviour.custom.look.LookAtTarget;
+import net.tslat.smartbrainlib.api.core.behaviour.custom.move.AvoidEntity;
 import net.tslat.smartbrainlib.api.core.behaviour.custom.move.FloatToSurfaceOfFluid;
 import net.tslat.smartbrainlib.api.core.behaviour.custom.move.MoveToWalkTarget;
 import net.tslat.smartbrainlib.api.core.behaviour.custom.path.SetWalkTargetToAttackTarget;
@@ -371,6 +372,10 @@ public class Chickensaur extends TamableAnimal implements SmartBrainOwner<Chicke
     public BrainActivityGroup<Chickensaur> getCoreTasks() { // These are the tasks that run all the time (usually)
         return BrainActivityGroup.coreTasks(
                 new FloatToSurfaceOfFluid<>(),              // Have the entity float to the surface of a fluid
+                new AvoidEntity<>().avoiding((entity) -> {
+                    EntityType<?> entityType = entity.getType();
+                    return this.getHealth() <= 5 && (entityType.is(Constants.INTIMIDATE) || entityType.is(Constants.GROUP_HUNT));
+                }).speedModifier(1.2F).noCloserThan(5),
                 new LookAtTarget<>(),                      // Have the entity turn to face and look at its current look target
                 new MoveToWalkTarget<>());                 // Walk towards the current walk target
     }
@@ -385,11 +390,13 @@ public class Chickensaur extends TamableAnimal implements SmartBrainOwner<Chicke
                                 if(entityType.is(Constants.HUNT)) {
                                     return true;
                                 }
-                                else if(entityType.is(Constants.INTIMIDATE) && this.distanceToSqr(livingEntity) < 4) {
-                                    return true;
-                                }
-                                else if(entityType.is(Constants.GROUP_HUNT)) {
-                                    return hasNumbersAdvantaqe(livingEntity);
+                                else if(this.getHealth() > 5) {
+                                    if(entityType.is(Constants.INTIMIDATE) && this.distanceToSqr(livingEntity) < 4) {
+                                        return true;
+                                    }
+                                    else if(entityType.is(Constants.GROUP_HUNT)) {
+                                        return hasNumbersAdvantaqe(livingEntity);
+                                    }
                                 }
                                 return false;
                             }
@@ -404,7 +411,10 @@ public class Chickensaur extends TamableAnimal implements SmartBrainOwner<Chicke
     @Override
     public BrainActivityGroup<Chickensaur> getFightTasks() { // These are the tasks that handle fighting
         return BrainActivityGroup.fightTasks(
-                new InvalidateAttackTarget<>(), // Cancel fighting if the target is no longer valid
+                new InvalidateAttackTarget<>().invalidateIf((attacker, target) -> {
+                    EntityType<?> entityType = target.getType();
+                    return attacker.getHealth() <= 5 && (entityType.is(Constants.INTIMIDATE) || entityType.is(Constants.GROUP_HUNT));
+                }), // Cancel fighting if the target is no longer valid
                 new SetWalkTargetToAttackTarget<>().speedMod((entity, target) -> 1.2F),      // Set the walk target to the attack target
                 new AnimatableMeleeAttack<>(5)); // Melee attack the target if close enough
     }
