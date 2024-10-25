@@ -376,13 +376,14 @@ public class Chickensaur extends TamableAnimal implements SmartBrainOwner<Chicke
                     EntityType<?> entityType = entity.getType();
                     return this.getHealth() <= 5 && (entityType.is(Constants.INTIMIDATE) || entityType.is(Constants.GROUP_HUNT));
                 }).speedModifier(1.2F).noCloserThan(5),
-                new LookAtTarget<>(),                      // Have the entity turn to face and look at its current look target
+                new LookAtTarget<>().runFor(entity -> entity.getRandom().nextIntBetweenInclusive(40, 300)),                      // Have the entity turn to face and look at its current look target
                 new MoveToWalkTarget<>());                 // Walk towards the current walk target
     }
 
     @Override
     public BrainActivityGroup<Chickensaur> getIdleTasks() { // These are the tasks that run when the mob isn't doing anything else (usually)
         return BrainActivityGroup.idleTasks(
+                new EatFoodInMainHand<>().runFor((entity) -> 150),
                 new FirstApplicableBehaviour(
                         new TargetOrRetaliate().attackablePredicate(target -> {
                                 LivingEntity livingEntity = (LivingEntity) target;
@@ -402,7 +403,6 @@ public class Chickensaur extends TamableAnimal implements SmartBrainOwner<Chicke
                             }
                         ),
                         new IntimidateLivingEntity().runFor((entity) -> 200),
-                        new EatFoodInMainHand<>().runFor((entity) -> 150),
                         new MoveToNearestVisibleWantedItem()
                 )
         );
