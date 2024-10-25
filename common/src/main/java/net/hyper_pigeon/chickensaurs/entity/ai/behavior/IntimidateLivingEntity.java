@@ -39,7 +39,7 @@ public class IntimidateLivingEntity<E extends PathfinderMob> extends ExtendedBeh
             Double distanceToChickensaur = livingEntity1.distanceToSqr(entity);
             return isIntimidateableEntity(livingEntity1) && distanceToChickensaur < 25 && distanceToChickensaur > 4;
         });
-        if (livingEntity.isPresent() && intimidateTarget == null) {
+        if (entity.getHealth() > 5 && livingEntity.isPresent() && intimidateTarget == null) {
             this.intimidateTarget = livingEntity.get();
             return true;
         }
