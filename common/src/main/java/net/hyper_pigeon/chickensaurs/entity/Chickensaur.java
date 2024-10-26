@@ -27,6 +27,7 @@ import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.ai.Brain;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.entity.ai.memory.MemoryModuleType;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.monster.AbstractSkeleton;
 import net.minecraft.world.entity.player.Player;
@@ -52,6 +53,7 @@ import net.tslat.smartbrainlib.api.core.behaviour.custom.move.FloatToSurfaceOfFl
 import net.tslat.smartbrainlib.api.core.behaviour.custom.move.MoveToWalkTarget;
 import net.tslat.smartbrainlib.api.core.behaviour.custom.path.SetWalkTargetToAttackTarget;
 import net.tslat.smartbrainlib.api.core.behaviour.custom.target.InvalidateAttackTarget;
+import net.tslat.smartbrainlib.api.core.behaviour.custom.target.SetRetaliateTarget;
 import net.tslat.smartbrainlib.api.core.behaviour.custom.target.TargetOrRetaliate;
 import net.tslat.smartbrainlib.api.core.sensor.ExtendedSensor;
 import net.tslat.smartbrainlib.api.core.sensor.custom.GenericAttackTargetSensor;
@@ -60,10 +62,12 @@ import net.tslat.smartbrainlib.api.core.sensor.vanilla.HurtBySensor;
 import net.tslat.smartbrainlib.api.core.sensor.vanilla.NearbyLivingEntitySensor;
 import net.tslat.smartbrainlib.api.core.sensor.vanilla.NearbyPlayersSensor;
 import net.tslat.smartbrainlib.api.core.sensor.vanilla.NearestItemSensor;
+import net.tslat.smartbrainlib.util.BrainUtils;
 import net.tslat.smartbrainlib.util.EntityRetrievalUtil;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
+import java.util.Objects;
 
 public class Chickensaur extends TamableAnimal implements SmartBrainOwner<Chickensaur> {
     public float flap;
@@ -419,6 +423,7 @@ public class Chickensaur extends TamableAnimal implements SmartBrainOwner<Chicke
         return BrainActivityGroup.idleTasks(
                 new EatFoodInMainHand<>().runFor((entity) -> 150),
                 new FirstApplicableBehaviour(
+                        new SetRetaliateTarget().alertAlliesWhen((owner,attacker) -> true),
                         new TargetOrRetaliate().attackablePredicate(target -> {
                                 LivingEntity livingEntity = (LivingEntity) target;
                                 EntityType<?> entityType = livingEntity.getType();
@@ -435,7 +440,7 @@ public class Chickensaur extends TamableAnimal implements SmartBrainOwner<Chicke
                                 }
                                 return false;
                             }
-                        ),
+                        ).alertAlliesWhen((owner,attacker) -> true),
                         new IntimidateLivingEntity().runFor((entity) -> 200),
                         new MoveToNearestVisibleWantedItem()
                 )
