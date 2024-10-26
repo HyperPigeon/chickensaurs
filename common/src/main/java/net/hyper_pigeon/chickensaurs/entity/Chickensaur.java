@@ -46,13 +46,17 @@ import net.tslat.smartbrainlib.api.SmartBrainOwner;
 import net.tslat.smartbrainlib.api.core.BrainActivityGroup;
 import net.tslat.smartbrainlib.api.core.SmartBrainProvider;
 import net.tslat.smartbrainlib.api.core.behaviour.FirstApplicableBehaviour;
+import net.tslat.smartbrainlib.api.core.behaviour.OneRandomBehaviour;
 import net.tslat.smartbrainlib.api.core.behaviour.custom.attack.AnimatableMeleeAttack;
 import net.tslat.smartbrainlib.api.core.behaviour.custom.look.LookAtTarget;
+import net.tslat.smartbrainlib.api.core.behaviour.custom.misc.Idle;
 import net.tslat.smartbrainlib.api.core.behaviour.custom.move.AvoidEntity;
 import net.tslat.smartbrainlib.api.core.behaviour.custom.move.FloatToSurfaceOfFluid;
 import net.tslat.smartbrainlib.api.core.behaviour.custom.move.MoveToWalkTarget;
+import net.tslat.smartbrainlib.api.core.behaviour.custom.path.SetRandomWalkTarget;
 import net.tslat.smartbrainlib.api.core.behaviour.custom.path.SetWalkTargetToAttackTarget;
 import net.tslat.smartbrainlib.api.core.behaviour.custom.target.InvalidateAttackTarget;
+import net.tslat.smartbrainlib.api.core.behaviour.custom.target.SetRandomLookTarget;
 import net.tslat.smartbrainlib.api.core.behaviour.custom.target.SetRetaliateTarget;
 import net.tslat.smartbrainlib.api.core.behaviour.custom.target.TargetOrRetaliate;
 import net.tslat.smartbrainlib.api.core.sensor.ExtendedSensor;
@@ -413,7 +417,7 @@ public class Chickensaur extends TamableAnimal implements SmartBrainOwner<Chicke
                 new AvoidEntity<>().avoiding((entity) -> {
                     EntityType<?> entityType = entity.getType();
                     return this.getHealth() <= 5 && (entityType.is(Constants.INTIMIDATE) || entityType.is(Constants.GROUP_HUNT));
-                }).speedModifier(1.2F).noCloserThan(5),
+                }).speedModifier(1.2F).noCloserThan(8),
                 new LookAtTarget<>().runFor(entity -> entity.getRandom().nextIntBetweenInclusive(40, 300)),                      // Have the entity turn to face and look at its current look target
                 new MoveToWalkTarget<>());                 // Walk towards the current walk target
     }
@@ -442,7 +446,12 @@ public class Chickensaur extends TamableAnimal implements SmartBrainOwner<Chicke
                             }
                         ).alertAlliesWhen((owner,attacker) -> true),
                         new IntimidateLivingEntity().runFor((entity) -> 200),
-                        new MoveToNearestVisibleWantedItem()
+                        new MoveToNearestVisibleWantedItem(),
+                        new OneRandomBehaviour(
+                                new SetRandomLookTarget(),
+                                new SetRandomWalkTarget().setRadius(3).speedModifier(1.0F).cooldownFor((entity) -> 150),
+                                new Idle<>().runFor(entity -> entity.getRandom().nextIntBetweenInclusive(30,60))
+                        )
                 )
         );
     }
@@ -450,10 +459,12 @@ public class Chickensaur extends TamableAnimal implements SmartBrainOwner<Chicke
     @Override
     public BrainActivityGroup<Chickensaur> getFightTasks() { // These are the tasks that handle fighting
         return BrainActivityGroup.fightTasks(
-                new InvalidateAttackTarget<>().invalidateIf((attacker, target) -> {
-                    EntityType<?> entityType = target.getType();
-                    return attacker.getHealth() <= 5 && (entityType.is(Constants.INTIMIDATE) || entityType.is(Constants.GROUP_HUNT));
-                }), // Cancel fighting if the target is no longer valid
+                new InvalidateAttackTarget<>()
+//                        .invalidateIf((attacker, target) -> {
+//                    EntityType<?> entityType = target.getType();
+//                    return attacker.getHealth() <= 5 && (entityType.is(Constants.INTIMIDATE) || entityType.is(Constants.GROUP_HUNT));
+//                })
+                , // Cancel fighting if the target is no longer valid
                 new SetWalkTargetToAttackTarget<>().speedMod((entity, target) -> 1.2F),      // Set the walk target to the attack target
                 new AnimatableMeleeAttack<>(6)
                         .whenStarting((mob) -> {
@@ -465,7 +476,7 @@ public class Chickensaur extends TamableAnimal implements SmartBrainOwner<Chicke
     }
 
     public static AttributeSupplier.Builder createAttributes() {
-        return Mob.createMobAttributes().add(Attributes.MOVEMENT_SPEED, 0.40000001192092896).add(Attributes.MAX_HEALTH, 30.0).add(Attributes.ATTACK_DAMAGE, 8.0).add(Attributes.ARMOR, 12F);
+        return Mob.createMobAttributes().add(Attributes.MOVEMENT_SPEED, 0.37500001192092896).add(Attributes.MAX_HEALTH, 25.0).add(Attributes.ATTACK_DAMAGE, 8.0).add(Attributes.ARMOR, 12F);
     }
 
 }
