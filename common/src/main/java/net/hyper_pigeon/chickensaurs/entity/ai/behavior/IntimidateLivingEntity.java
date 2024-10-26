@@ -6,6 +6,7 @@ import net.hyper_pigeon.chickensaurs.Constants;
 import net.hyper_pigeon.chickensaurs.entity.Chickensaur;
 import net.hyper_pigeon.chickensaurs.entity.ai.memory_types.ChickensaurMemoryTypes;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.entity.ai.behavior.EntityTracker;
@@ -30,7 +31,8 @@ public class IntimidateLivingEntity<E extends PathfinderMob> extends ExtendedBeh
     }
 
     public boolean isIntimidateableEntity(LivingEntity livingEntity) {
-        return livingEntity.getType().is(Constants.INTIMIDATE);
+        boolean isInCreative = livingEntity instanceof ServerPlayer serverPlayer && serverPlayer.isCreative();
+        return livingEntity.getType().is(Constants.INTIMIDATE) && !isInCreative;
     }
 
     @Override

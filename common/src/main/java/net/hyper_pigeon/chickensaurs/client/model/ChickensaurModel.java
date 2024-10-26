@@ -19,13 +19,16 @@ public class ChickensaurModel extends HierarchicalModel<Chickensaur> {
     public static final ModelLayerLocation LAYER_LOCATION = new ModelLayerLocation(ResourceLocation.fromNamespaceAndPath(Constants.MOD_ID, "chickensaur"), "main");
 
     private final ModelPart root;
-    private final ModelPart head;
     private final ModelPart upper;
     private final ModelPart neck;
+    private final ModelPart necku;
+    private final ModelPart neckd;
+    private final ModelPart head;
     private final ModelPart beak;
     private final ModelPart beakd;
     private final ModelPart beaku;
     private final ModelPart body;
+    private final ModelPart tail;
     private final ModelPart wingr;
     private final ModelPart wingl;
     private final ModelPart legr;
@@ -36,11 +39,14 @@ public class ChickensaurModel extends HierarchicalModel<Chickensaur> {
         this.root = root;
         this.upper = root.getChild("upper");
         this.neck = this.upper.getChild("neck");
+        this.necku = this.neck.getChild("necku");
+        this.neckd = this.neck.getChild("neckd");
         this.head = this.upper.getChild("head");
         this.beak = this.head.getChild("beak");
         this.beakd = this.beak.getChild("beakd");
         this.beaku = this.beak.getChild("beaku");
         this.body = root.getChild("body");
+        this.tail = this.body.getChild("tail");
         this.wingr = root.getChild("wingr");
         this.wingl = root.getChild("wingl");
         this.legr = root.getChild("legr");
@@ -55,9 +61,13 @@ public class ChickensaurModel extends HierarchicalModel<Chickensaur> {
 
         PartDefinition neck = upper.addOrReplaceChild("neck", CubeListBuilder.create(), PartPose.offset(0.0F, -1.0F, -1.0F));
 
-        PartDefinition cube_r1 = neck.addOrReplaceChild("cube_r1", CubeListBuilder.create().texOffs(21, 11).addBox(-2.0F, -2.0F, -1.0F, 4.0F, 5.0F, 3.0F, new CubeDeformation(0.0F)), PartPose.offsetAndRotation(0.0F, 0.0F, 0.0F, 0.4363F, 0.0F, 0.0F));
+        PartDefinition necku = neck.addOrReplaceChild("necku", CubeListBuilder.create(), PartPose.offset(0.0F, -1.5F, 0.0F));
 
-        PartDefinition cube_r2 = neck.addOrReplaceChild("cube_r2", CubeListBuilder.create().texOffs(21, 11).addBox(-2.0F, -3.0F, -1.0F, 4.0F, 6.0F, 3.0F, new CubeDeformation(0.0F)), PartPose.offsetAndRotation(0.0F, -4.0F, 0.0F, -0.3054F, 0.0F, 0.0F));
+        PartDefinition cube_r1 = necku.addOrReplaceChild("cube_r1", CubeListBuilder.create().texOffs(21, 11).addBox(-2.0F, -3.0F, -1.0F, 4.0F, 6.0F, 3.0F, new CubeDeformation(0.0F)), PartPose.offsetAndRotation(0.0F, -2.5F, 0.0F, -0.3054F, 0.0F, 0.0F));
+
+        PartDefinition neckd = neck.addOrReplaceChild("neckd", CubeListBuilder.create(), PartPose.offset(0.0F, 0.0F, 0.0F));
+
+        PartDefinition cube_r2 = neckd.addOrReplaceChild("cube_r2", CubeListBuilder.create().texOffs(21, 11).addBox(-2.0F, -4.6579F, -1.9674F, 4.0F, 5.0F, 3.0F, new CubeDeformation(0.0F)), PartPose.offsetAndRotation(0.0F, 2.0F, 2.0F, 0.4363F, 0.0F, 0.0F));
 
         PartDefinition head = upper.addOrReplaceChild("head", CubeListBuilder.create().texOffs(0, 0).addBox(-3.0F, -6.0F, -3.0F, 6.0F, 6.0F, 6.0F, new CubeDeformation(0.0F))
                 .texOffs(0, 12).addBox(-1.5F, -7.0F, -6.0F, 3.0F, 2.0F, 6.0F, new CubeDeformation(0.0F))
@@ -73,11 +83,13 @@ public class ChickensaurModel extends HierarchicalModel<Chickensaur> {
 
         PartDefinition body = partdefinition.addOrReplaceChild("body", CubeListBuilder.create().texOffs(0, 20).addBox(-4.0F, -3.0F, -7.0F, 8.0F, 7.0F, 13.0F, new CubeDeformation(0.0F)), PartPose.offset(0.0F, 11.0F, 2.0F));
 
-        PartDefinition cube_r4 = body.addOrReplaceChild("cube_r4", CubeListBuilder.create().texOffs(0, 40).addBox(-3.0F, -2.0F, -1.0F, 6.0F, 5.0F, 5.0F, new CubeDeformation(0.0F)), PartPose.offsetAndRotation(0.0F, 0.0F, 6.0F, -0.4363F, 0.0F, 0.0F));
+        PartDefinition tail = body.addOrReplaceChild("tail", CubeListBuilder.create(), PartPose.offset(0.0F, 0.0F, 6.0F));
 
-        PartDefinition wingr = partdefinition.addOrReplaceChild("wingr", CubeListBuilder.create().texOffs(29, 19).mirror().addBox(-1.0F, 0.0F, -4.0F, 1.0F, 5.0F, 9.0F, new CubeDeformation(0.0F)).mirror(false), PartPose.offset(-4.0F, 8.0F, 1.0F));
+        PartDefinition cube_r4 = tail.addOrReplaceChild("cube_r4", CubeListBuilder.create().texOffs(0, 40).addBox(-3.0F, -2.0F, -1.0F, 6.0F, 5.0F, 5.0F, new CubeDeformation(0.0F)), PartPose.offsetAndRotation(0.0F, 0.0F, 0.0F, -0.4363F, 0.0F, 0.0F));
 
-        PartDefinition wingl = partdefinition.addOrReplaceChild("wingl", CubeListBuilder.create().texOffs(29, 19).addBox(0.0F, 0.0F, -4.0F, 1.0F, 5.0F, 9.0F, new CubeDeformation(0.0F)), PartPose.offset(4.0F, 8.0F, 1.0F));
+        PartDefinition wingr = partdefinition.addOrReplaceChild("wingr", CubeListBuilder.create().texOffs(29, 19).mirror().addBox(-1.0F, -1.0F, -4.0F, 1.0F, 5.0F, 9.0F, new CubeDeformation(0.0F)).mirror(false), PartPose.offset(-4.0F, 9.0F, 1.0F));
+
+        PartDefinition wingl = partdefinition.addOrReplaceChild("wingl", CubeListBuilder.create().texOffs(29, 19).addBox(0.0F, -1.0F, -4.0F, 1.0F, 5.0F, 9.0F, new CubeDeformation(0.0F)), PartPose.offset(4.0F, 9.0F, 1.0F));
 
         PartDefinition legr = partdefinition.addOrReplaceChild("legr", CubeListBuilder.create().texOffs(5, 22).mirror().addBox(-1.0F, 0.0F, -1.0F, 2.0F, 9.0F, 2.0F, new CubeDeformation(0.0F)).mirror(false)
                 .texOffs(1, 22).mirror().addBox(-1.0F, 9.0F, -3.0F, 2.0F, 0.0F, 2.0F, new CubeDeformation(0.0F)).mirror(false), PartPose.offset(-2.0F, 15.0F, 3.0F));
@@ -93,6 +105,7 @@ public class ChickensaurModel extends HierarchicalModel<Chickensaur> {
         this.root().getAllParts().forEach(ModelPart::resetPose);
         this.setHeadAngles(netHeadYaw,headPitch);
         this.animate(entity.intimidateAnimationState, ChickensaurAnimation.CHICKENSAUR_INTIMIDATE, ageInTicks);
+        this.animate(entity.biteAnimationState, ChickensaurAnimation.CHICKENSAUR_BITE,ageInTicks);
         this.animateWalk(ChickensaurAnimation.CHICKENSAUR_WALK, limbSwing, limbSwingAmount, 2F, 2F);
     }
 

@@ -79,8 +79,12 @@ public class Chickensaur extends TamableAnimal implements SmartBrainOwner<Chicke
     private static final EntityDataAccessor<Boolean> INTIMIDATING = SynchedEntityData.defineId(Chickensaur.class, EntityDataSerializers.BOOLEAN);
     private static final EntityDataAccessor<Integer> INTIMIDATING_TICKS = SynchedEntityData.defineId(Chickensaur.class, EntityDataSerializers.INT);
 
+    private static final EntityDataAccessor<Boolean> ATTACKING = SynchedEntityData.defineId(Chickensaur.class, EntityDataSerializers.BOOLEAN);
+
+
     public final AnimationState walkAnimationState = new AnimationState();
     public final AnimationState intimidateAnimationState = new AnimationState();
+    public final AnimationState biteAnimationState = new AnimationState();
 
 
     public Chickensaur(EntityType<? extends TamableAnimal> pEntityType, Level pLevel) {
@@ -93,6 +97,7 @@ public class Chickensaur extends TamableAnimal implements SmartBrainOwner<Chicke
         super.defineSynchedData(pBuilder);
         pBuilder.define(INTIMIDATING,false);
         pBuilder.define(INTIMIDATING_TICKS, 0);
+        pBuilder.define(ATTACKING, false);
     }
 
     @Override
@@ -172,6 +177,29 @@ public class Chickensaur extends TamableAnimal implements SmartBrainOwner<Chicke
                 }
             }
         }
+
+        if(isAttacking()) {
+            if(!biteAnimationState.isStarted()) {
+                biteAnimationState.start(this.tickCount);
+            }
+        }
+        else {
+            if(biteAnimationState.isStarted()) {
+                biteAnimationState.stop();
+            }
+        }
+
+//        if(getAttackingTicks() > 0) {
+//            if(!biteAnimationState.isStarted()) {
+//                int ticks = getAttackingTicks() + 1;
+//                biteAnimationState.start(this.tickCount);
+//                setAttackingTicks(ticks);
+//            }
+//            else if(getAttackingTicks() > 5) {
+//                biteAnimationState.stop();
+//                setAttackingTicks(0);
+//            }
+//        }
 
 //        if(this.level().isClientSide) {
 //            if(isIntimidating()) {
@@ -339,7 +367,13 @@ public class Chickensaur extends TamableAnimal implements SmartBrainOwner<Chicke
         return this.entityData.get(INTIMIDATING_TICKS);
     }
 
+    public void setAttacking(boolean attacking) {
+        this.entityData.set(ATTACKING, attacking);
+    }
 
+    public boolean isAttacking(){
+        return this.entityData.get(ATTACKING);
+    }
 
 
     @Override
@@ -416,7 +450,13 @@ public class Chickensaur extends TamableAnimal implements SmartBrainOwner<Chicke
                     return attacker.getHealth() <= 5 && (entityType.is(Constants.INTIMIDATE) || entityType.is(Constants.GROUP_HUNT));
                 }), // Cancel fighting if the target is no longer valid
                 new SetWalkTargetToAttackTarget<>().speedMod((entity, target) -> 1.2F),      // Set the walk target to the attack target
-                new AnimatableMeleeAttack<>(5)); // Melee attack the target if close enough
+                new AnimatableMeleeAttack<>(6)
+                        .whenStarting((mob) -> {
+                            this.setAttacking(true);
+                        })
+                        .whenStopping((mob -> {
+                            this.setAttacking(false);
+                        }))); // Melee attack the target if close enough
     }
 
     public static AttributeSupplier.Builder createAttributes() {
