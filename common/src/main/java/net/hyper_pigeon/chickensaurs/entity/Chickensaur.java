@@ -114,7 +114,7 @@ public class Chickensaur extends TamableAnimal implements SmartBrainOwner<Chicke
     @Nullable
     @Override
     public AgeableMob getBreedOffspring(ServerLevel serverLevel, AgeableMob ageableMob) {
-        return null;
+        return EntityRegistry.CHICKENSAUR.get().create(serverLevel);
     }
 
     public void aiStep() {

@@ -5,7 +5,6 @@ import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.hyper_pigeon.chickensaurs.Constants;
 import net.hyper_pigeon.chickensaurs.client.animation.definitions.ChickensaurAnimation;
 import net.hyper_pigeon.chickensaurs.entity.Chickensaur;
-import net.minecraft.client.animation.definitions.FrogAnimation;
 import net.minecraft.client.model.HierarchicalModel;
 import net.minecraft.client.model.geom.ModelLayerLocation;
 import net.minecraft.client.model.geom.ModelPart;
@@ -119,13 +118,16 @@ public class ChickensaurModel extends HierarchicalModel<Chickensaur> {
 
 
     @Override
-    public void renderToBuffer(PoseStack poseStack, VertexConsumer vertexConsumer, int i, int i1, int i2) {
-        upper.render(poseStack, vertexConsumer, i, i1, i2);
-        body.render(poseStack, vertexConsumer, i, i1, i2);
-        wingr.render(poseStack, vertexConsumer, i, i1, i2);
-        wingl.render(poseStack, vertexConsumer, i, i1, i2);
-        legr.render(poseStack, vertexConsumer, i, i1, i2);
-        legl.render(poseStack, vertexConsumer, i, i1, i2);
+    public void renderToBuffer(PoseStack pPoseStack, VertexConsumer pBuffer, int pPackedLight, int pPackedOverlay, int pColor) {
+        if (this.young) {
+            pPoseStack.pushPose();
+            pPoseStack.scale(0.45F, 0.45F, 0.45F);
+            pPoseStack.translate(0.0F, 1.834375F, 0.0F);
+            this.root().render(pPoseStack, pBuffer, pPackedLight, pPackedOverlay, pColor);
+            pPoseStack.popPose();
+        } else {
+            this.root().render(pPoseStack, pBuffer, pPackedLight, pPackedOverlay, pColor);
+        }
     }
 
     @Override
