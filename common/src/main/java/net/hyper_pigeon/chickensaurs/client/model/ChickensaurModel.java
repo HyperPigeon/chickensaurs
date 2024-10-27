@@ -92,10 +92,10 @@ public class ChickensaurModel extends HierarchicalModel<Chickensaur> {
         PartDefinition wingl = partdefinition.addOrReplaceChild("wingl", CubeListBuilder.create().texOffs(29, 19).addBox(0.0F, -1.0F, -4.0F, 1.0F, 5.0F, 9.0F, new CubeDeformation(0.0F)), PartPose.offset(4.0F, 9.0F, 1.0F));
 
         PartDefinition legr = partdefinition.addOrReplaceChild("legr", CubeListBuilder.create().texOffs(5, 22).mirror().addBox(-1.0F, 0.0F, -1.0F, 2.0F, 9.0F, 2.0F, new CubeDeformation(0.0F)).mirror(false)
-                .texOffs(1, 22).mirror().addBox(-1.0F, 9.0F, -3.0F, 2.0F, 0.0F, 2.0F, new CubeDeformation(0.0F)).mirror(false), PartPose.offset(-2.0F, 15.0F, 3.0F));
+                .texOffs(1, 22).mirror().addBox(-1.0F, 8.99F, -3.0F, 2.0F, 0.0F, 2.0F, new CubeDeformation(0.0F)).mirror(false), PartPose.offset(-2.0F, 15.0F, 3.0F));
 
         PartDefinition legl = partdefinition.addOrReplaceChild("legl", CubeListBuilder.create().texOffs(5, 22).addBox(-1.0F, 0.0F, -1.0F, 2.0F, 9.0F, 2.0F, new CubeDeformation(0.0F))
-                .texOffs(1, 22).addBox(-1.0F, 9.0F, -3.0F, 2.0F, 0.0F, 2.0F, new CubeDeformation(0.0F)), PartPose.offset(2.0F, 15.0F, 3.0F));
+                .texOffs(1, 22).addBox(-1.0F, 8.99F, -3.0F, 2.0F, 0.0F, 2.0F, new CubeDeformation(0.0F)), PartPose.offset(2.0F, 15.0F, 3.0F));
 
         return LayerDefinition.create(meshdefinition, 64, 64);
     }
@@ -114,7 +114,7 @@ public class ChickensaurModel extends HierarchicalModel<Chickensaur> {
         headPitch = Mth.clamp(headPitch, -30.0F, 30.0F);
 
         this.head.yRot = headYaw * 0.017453292F;
-        this.head.xRot = headPitch * -0.017453292F;
+        this.head.xRot = headPitch * 0.017453292F;
     }
 
 

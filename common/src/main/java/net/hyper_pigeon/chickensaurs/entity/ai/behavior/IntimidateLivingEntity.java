@@ -9,6 +9,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.PathfinderMob;
+import net.minecraft.world.entity.ai.Brain;
 import net.minecraft.world.entity.ai.behavior.EntityTracker;
 import net.minecraft.world.entity.ai.memory.MemoryModuleType;
 import net.minecraft.world.entity.ai.memory.MemoryStatus;
@@ -38,10 +39,10 @@ public class IntimidateLivingEntity<E extends PathfinderMob> extends ExtendedBeh
     @Override
     protected boolean checkExtraStartConditions(ServerLevel level, E entity) {
         Optional<LivingEntity> livingEntity = BrainUtils.getMemory(entity, MemoryModuleType.NEAREST_VISIBLE_LIVING_ENTITIES).findClosest((livingEntity1) -> {
-            Double distanceToChickensaur = livingEntity1.distanceToSqr(entity);
-            return isIntimidateableEntity(livingEntity1) && distanceToChickensaur < 25 && distanceToChickensaur > 4;
+            double distanceToChickensaur = livingEntity1.distanceToSqr(entity);
+            return isIntimidateableEntity(livingEntity1) && distanceToChickensaur < 36 && distanceToChickensaur > 4;
         });
-        if (entity.getHealth() > 5 && livingEntity.isPresent() && intimidateTarget == null) {
+        if (entity.getHealth() > 5 && livingEntity.isPresent() && intimidateTarget == null && !BrainUtils.hasMemory(entity,MemoryModuleType.ATTACK_TARGET)) {
             this.intimidateTarget = livingEntity.get();
             return true;
         }
@@ -59,8 +60,8 @@ public class IntimidateLivingEntity<E extends PathfinderMob> extends ExtendedBeh
     }
 
     protected boolean shouldKeepRunning(E entity) {
-        if (intimidateTarget != null && intimidateTarget.isAlive()) {
-            Double distanceToChickensaur = intimidateTarget.distanceToSqr(entity);
+        if (intimidateTarget != null && intimidateTarget.isAlive() && !BrainUtils.hasMemory(entity, MemoryModuleType.ATTACK_TARGET)) {
+            double distanceToChickensaur = intimidateTarget.distanceToSqr(entity);
             if (distanceToChickensaur < 25 && distanceToChickensaur > 4) {
                 return true;
             }
@@ -72,6 +73,16 @@ public class IntimidateLivingEntity<E extends PathfinderMob> extends ExtendedBeh
     protected void stop(E entity) {
         Chickensaur chickensaur = (Chickensaur) entity;
         chickensaur.setIntimidating(false);
+
+
+        if(intimidateTarget.isAlive() ) {
+            double distanceToChickensaur = intimidateTarget.distanceToSqr(entity);
+            if(distanceToChickensaur < 25) {
+                BrainUtils.setTargetOfEntity(entity, this.intimidateTarget);
+                BrainUtils.clearMemory(entity, MemoryModuleType.CANT_REACH_WALK_TARGET_SINCE);
+            }
+        }
+
         this.intimidateTarget = null;
         BrainUtils.clearMemory(chickensaur, ChickensaurMemoryTypes.INTIMIDATE_TARGET.get());
         BrainUtils.clearMemory(chickensaur, MemoryModuleType.LOOK_TARGET);
