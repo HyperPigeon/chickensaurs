@@ -6,6 +6,7 @@ import net.minecraft.tags.TagKey;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.biome.Biome;
+import net.minecraft.world.level.block.Block;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,6 +29,10 @@ public class Constants {
 	public static final TagKey<Item> CHICKENSAUR_FOOD = TagKey.create(Registries.ITEM, CHICKENSAUR_FOOD_ID);
 
 	public static final TagKey<Biome> CHICKENSAUR_SPAWN_BIOMES = TagKey.create(Registries.BIOME, ResourceLocation.parse("chickensaurs:chickensaur_spawn_biomes"));
+
+	public static final ResourceLocation GUARDED_BY_CHICKENSAURS_ID = ResourceLocation.parse("chickensaurs:guarded_by_chickensaurs");
+	public static final TagKey<Block> GUARDED_BY_CHICKENSAURS = TagKey.create(Registries.BLOCK, GUARDED_BY_CHICKENSAURS_ID);
+
 
 
 }

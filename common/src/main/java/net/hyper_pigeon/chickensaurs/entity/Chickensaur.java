@@ -26,8 +26,10 @@ import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.ai.Brain;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.entity.ai.behavior.BehaviorUtils;
 import net.minecraft.world.entity.ai.memory.MemoryModuleType;
 import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.entity.monster.piglin.Piglin;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -502,6 +504,13 @@ public class Chickensaur extends TamableAnimal implements SmartBrainOwner<Chicke
 
     public static AttributeSupplier.Builder createAttributes() {
         return Mob.createMobAttributes().add(Attributes.MOVEMENT_SPEED, 0.37500001192092896).add(Attributes.MAX_HEALTH, 25.0).add(Attributes.ATTACK_DAMAGE, 8.0).add(Attributes.ARMOR, 12F).add(Attributes.FOLLOW_RANGE,16F);
+    }
+
+    public static void angerNearbyChickensaurs(Player player, boolean angerOnlyIfCanSee) {
+        List<Chickensaur> list = player.level().getEntitiesOfClass(Chickensaur.class, player.getBoundingBox().inflate(16.0));
+        list.stream().filter(chickensaur -> !angerOnlyIfCanSee || BehaviorUtils.canSee(chickensaur,player)).forEach(chickensaur -> {
+            BrainUtils.setTargetOfEntity(chickensaur, player);
+        });
     }
 
 }
