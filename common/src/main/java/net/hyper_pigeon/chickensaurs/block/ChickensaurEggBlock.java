@@ -24,7 +24,7 @@ import net.minecraft.world.level.material.PushReaction;
 import net.minecraft.world.phys.Vec3;
 
 public class ChickensaurEggBlock extends Block {
-    private static final int HATCH_TIME_TICKS = 100;
+    private static final int HATCH_TIME_TICKS = 10000;
     private static final int MAX_HATCH_LEVEL = 1; // No intermediate hatching stages
     public static final IntegerProperty HATCH = BlockStateProperties.HATCH;
 
