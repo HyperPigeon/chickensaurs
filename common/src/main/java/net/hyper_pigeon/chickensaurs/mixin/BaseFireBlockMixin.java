@@ -22,7 +22,6 @@ public abstract class BaseFireBlockMixin extends Block {
     @Inject(method = "entityInside", at = @At("HEAD"), cancellable = true)
     public void chickensaurImmunity(BlockState pState, Level pLevel, BlockPos pPos, Entity pEntity, CallbackInfo ci){
         if(pEntity instanceof Chickensaur) {
-            entityInside(pState,pLevel,pPos,pEntity);
             ci.cancel();
         }
     }
