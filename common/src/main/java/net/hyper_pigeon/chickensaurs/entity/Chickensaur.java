@@ -71,8 +71,6 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 
 public class Chickensaur extends TamableAnimal implements SmartBrainOwner<Chickensaur> {
-    private static final float BABY_SCALE = 0.5F;
-    private static final EntityDimensions BABY_DIMENSIONS = EntityRegistry.CHICKENSAUR.get().getDimensions().scale(BABY_SCALE);
     public float flap;
     public float flapSpeed;
     public float oFlapSpeed;
@@ -97,16 +95,6 @@ public class Chickensaur extends TamableAnimal implements SmartBrainOwner<Chicke
     public Chickensaur(EntityType<? extends TamableAnimal> pEntityType, Level pLevel) {
         super(pEntityType, pLevel);
         this.shedTime = this.random.nextInt(6000) + 6000;
-    }
-
-    @Override
-    public EntityDimensions getDefaultDimensions(Pose pPose) {
-        return this.isBaby() ? BABY_DIMENSIONS : super.getDefaultDimensions(pPose);
-    }
-
-    @Override
-    public float getScale() {
-        return this.isBaby() ? BABY_SCALE : 1.0F;
     }
 
     @Override
