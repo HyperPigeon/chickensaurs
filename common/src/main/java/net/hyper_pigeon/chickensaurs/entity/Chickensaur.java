@@ -7,16 +7,15 @@ import net.hyper_pigeon.chickensaurs.entity.ai.behavior.IntimidateLivingEntity;
 import net.hyper_pigeon.chickensaurs.entity.ai.behavior.MoveToNearestVisibleWantedItem;
 import net.hyper_pigeon.chickensaurs.register.EntityRegistry;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
 import net.minecraft.core.Vec3i;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
-import net.minecraft.sounds.SoundSource;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
@@ -29,15 +28,13 @@ import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.memory.MemoryModuleType;
 import net.minecraft.world.entity.item.ItemEntity;
-import net.minecraft.world.entity.monster.AbstractSkeleton;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.LevelReader;
-import net.minecraft.world.level.block.BaseFireBlock;
-import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.phys.AABB;
@@ -57,7 +54,6 @@ import net.tslat.smartbrainlib.api.core.behaviour.custom.path.SetRandomWalkTarge
 import net.tslat.smartbrainlib.api.core.behaviour.custom.path.SetWalkTargetToAttackTarget;
 import net.tslat.smartbrainlib.api.core.behaviour.custom.target.InvalidateAttackTarget;
 import net.tslat.smartbrainlib.api.core.behaviour.custom.target.SetRandomLookTarget;
-import net.tslat.smartbrainlib.api.core.behaviour.custom.target.SetRetaliateTarget;
 import net.tslat.smartbrainlib.api.core.behaviour.custom.target.TargetOrRetaliate;
 import net.tslat.smartbrainlib.api.core.sensor.ExtendedSensor;
 import net.tslat.smartbrainlib.api.core.sensor.custom.GenericAttackTargetSensor;
@@ -71,7 +67,6 @@ import net.tslat.smartbrainlib.util.EntityRetrievalUtil;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
-import java.util.Objects;
 
 public class Chickensaur extends TamableAnimal implements SmartBrainOwner<Chickensaur> {
     public float flap;
@@ -383,6 +378,55 @@ public class Chickensaur extends TamableAnimal implements SmartBrainOwner<Chicke
         return this.entityData.get(ATTACKING);
     }
 
+    public boolean canAttackTarget(LivingEntity target) {
+        EntityType<?> type = target.getType();
+        if(!target.isDeadOrDying() && !target.isRemoved()) {
+            if(target instanceof ServerPlayer player && player.isCreative()) {
+                return false;
+            }
+            else if(type.is(Constants.HUNT)) {
+                return true;
+            }
+            else if(this.getHealth() >= 5) {
+                DamageSource damageSource = this.getLastDamageSource();
+                if(damageSource != null) {
+                    Entity revengeTarget = damageSource.getEntity();
+                    return revengeTarget != null && revengeTarget.is(target);
+                }
+                else if(type.is(Constants.INTIMIDATE) && this.distanceToSqr(target) < 4) {
+                    return true;
+                }
+                else if(type.is(Constants.GROUP_HUNT)) {
+                    return hasNumbersAdvantaqe(target);
+                }
+            }
+        }
+        return false;
+    }
+
+    public boolean isInvalidTarget(LivingEntity attacker, LivingEntity target) {
+        EntityType<?> type = target.getType();
+        if(!target.isDeadOrDying() && !target.isRemoved()) {
+                if(target instanceof ServerPlayer player && player.isCreative()) {
+                    return true;
+                }
+                if(type.is(Constants.HUNT)) {
+                    return false;
+                }
+                else return attacker.getHealth() < 5;
+        }
+        return true;
+    }
+
+    public void forgivePlayer(ServerPlayer target){
+        if(target.level().getGameRules().getBoolean(GameRules.RULE_FORGIVE_DEAD_PLAYERS) && BrainUtils.hasMemory(this,MemoryModuleType.HURT_BY_ENTITY) ) {
+            Entity lastHurtBy = BrainUtils.getMemory(this, MemoryModuleType.HURT_BY_ENTITY);
+            if(lastHurtBy != null && lastHurtBy.is(target)) {
+                BrainUtils.clearMemory(this, MemoryModuleType.HURT_BY_ENTITY);
+            }
+        }
+    }
+
 
     @Override
     protected Brain.Provider<?> brainProvider() {
@@ -398,7 +442,7 @@ public class Chickensaur extends TamableAnimal implements SmartBrainOwner<Chicke
     public List<? extends ExtendedSensor<? extends Chickensaur>> getSensors() {
         return ObjectArrayList.of(
                 new NearbyPlayersSensor<>(),
-                new NearbyLivingEntitySensor<Chickensaur>().setRadius(32).setPredicate((target,entity) -> {
+                new NearbyLivingEntitySensor<Chickensaur>().setRadius(16).setPredicate((target,entity) -> {
                     EntityType<?> entityType = target.getType();
                     return entityType.is(Constants.HUNT) || entityType.is(Constants.GROUP_HUNT) || entityType.is(Constants.INTIMIDATE);
                 }),
@@ -413,43 +457,28 @@ public class Chickensaur extends TamableAnimal implements SmartBrainOwner<Chicke
     @Override
     public BrainActivityGroup<Chickensaur> getCoreTasks() { // These are the tasks that run all the time (usually)
         return BrainActivityGroup.coreTasks(
-                new FloatToSurfaceOfFluid<>(),              // Have the entity float to the surface of a fluid
-                new AvoidEntity<>().avoiding((entity) -> {
+                new FloatToSurfaceOfFluid<Chickensaur>(),              // Have the entity float to the surface of a fluid
+                new AvoidEntity<Chickensaur>().avoiding((entity) -> {
                     EntityType<?> entityType = entity.getType();
-                    return this.getHealth() <= 5 && (entityType.is(Constants.INTIMIDATE) || entityType.is(Constants.GROUP_HUNT));
+                    return this.getHealth() < 5 && ((this.getLastAttacker() != null && this.getLastAttacker().is(entity)) || (entityType.is(Constants.INTIMIDATE) || entityType.is(Constants.GROUP_HUNT)));
                 }).speedModifier(1.2F).noCloserThan(8),
-                new LookAtTarget<>().runFor(entity -> entity.getRandom().nextIntBetweenInclusive(40, 300)),                      // Have the entity turn to face and look at its current look target
-                new MoveToWalkTarget<>());                 // Walk towards the current walk target
+                new LookAtTarget<Chickensaur>().runFor(entity -> entity.getRandom().nextIntBetweenInclusive(40, 300)),                      // Have the entity turn to face and look at its current look target
+                new MoveToWalkTarget<Chickensaur>());                 // Walk towards the current walk target
     }
 
     @Override
     public BrainActivityGroup<Chickensaur> getIdleTasks() { // These are the tasks that run when the mob isn't doing anything else (usually)
         return BrainActivityGroup.idleTasks(
-                new EatFoodInMainHand<>().runFor((entity) -> 150),
+                new EatFoodInMainHand<>().runFor((entity) -> 100),
                 new FirstApplicableBehaviour(
-                        new SetRetaliateTarget().alertAlliesWhen((owner,attacker) -> true),
-                        new TargetOrRetaliate().attackablePredicate(target -> {
-                                LivingEntity livingEntity = (LivingEntity) target;
-                                EntityType<?> entityType = livingEntity.getType();
-                                if(entityType.is(Constants.HUNT)) {
-                                    return true;
-                                }
-                                else if(this.getHealth() > 5) {
-                                    if(entityType.is(Constants.INTIMIDATE) && this.distanceToSqr(livingEntity) < 4) {
-                                        return true;
-                                    }
-                                    else if(entityType.is(Constants.GROUP_HUNT)) {
-                                        return hasNumbersAdvantaqe(livingEntity);
-                                    }
-                                }
-                                return false;
-                            }
-                        ).alertAlliesWhen((owner,attacker) -> true),
-                        new IntimidateLivingEntity().runFor((entity) -> 200),
-                        new MoveToNearestVisibleWantedItem(),
+                        new TargetOrRetaliate<Chickensaur>().alertAlliesWhen((owner, attacker) ->  {
+                            return attacker != null && owner.canAttackTarget((LivingEntity) attacker) ;
+                        }).attackablePredicate(this::canAttackTarget),
+                        new IntimidateLivingEntity<Chickensaur>().runFor((entity) -> 200),
+                        new MoveToNearestVisibleWantedItem<Chickensaur>().cooldownFor((entity) -> 100),
                         new OneRandomBehaviour(
-                                new SetRandomLookTarget(),
-                                new SetRandomWalkTarget().setRadius(3).speedModifier(1.0F).cooldownFor((entity) -> 150),
+                                new SetRandomLookTarget<Chickensaur>(),
+                                new SetRandomWalkTarget<Chickensaur>().setRadius(3).speedModifier(1.0F).cooldownFor((entity) -> 150),
                                 new Idle<>().runFor(entity -> entity.getRandom().nextIntBetweenInclusive(30,60))
                         )
                 )
@@ -460,11 +489,7 @@ public class Chickensaur extends TamableAnimal implements SmartBrainOwner<Chicke
     public BrainActivityGroup<Chickensaur> getFightTasks() { // These are the tasks that handle fighting
         return BrainActivityGroup.fightTasks(
                 new InvalidateAttackTarget<>()
-//                        .invalidateIf((attacker, target) -> {
-//                    EntityType<?> entityType = target.getType();
-//                    return attacker.getHealth() <= 5 && (entityType.is(Constants.INTIMIDATE) || entityType.is(Constants.GROUP_HUNT));
-//                })
-                , // Cancel fighting if the target is no longer valid
+                        .invalidateIf(this::isInvalidTarget), // Cancel fighting if the target is no longer valid
                 new SetWalkTargetToAttackTarget<>().speedMod((entity, target) -> 1.2F),      // Set the walk target to the attack target
                 new AnimatableMeleeAttack<>(6)
                         .whenStarting((mob) -> {
@@ -476,7 +501,7 @@ public class Chickensaur extends TamableAnimal implements SmartBrainOwner<Chicke
     }
 
     public static AttributeSupplier.Builder createAttributes() {
-        return Mob.createMobAttributes().add(Attributes.MOVEMENT_SPEED, 0.37500001192092896).add(Attributes.MAX_HEALTH, 25.0).add(Attributes.ATTACK_DAMAGE, 8.0).add(Attributes.ARMOR, 12F);
+        return Mob.createMobAttributes().add(Attributes.MOVEMENT_SPEED, 0.37500001192092896).add(Attributes.MAX_HEALTH, 25.0).add(Attributes.ATTACK_DAMAGE, 8.0).add(Attributes.ARMOR, 12F).add(Attributes.FOLLOW_RANGE,16F);
     }
 
 }
