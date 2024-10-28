@@ -78,8 +78,7 @@ public class IntimidateLivingEntity<E extends PathfinderMob> extends ExtendedBeh
         if(intimidateTarget.isAlive() ) {
             double distanceToChickensaur = intimidateTarget.distanceToSqr(entity);
             if(distanceToChickensaur < 25) {
-                BrainUtils.setTargetOfEntity(entity, this.intimidateTarget);
-                BrainUtils.clearMemory(entity, MemoryModuleType.CANT_REACH_WALK_TARGET_SINCE);
+                Chickensaur.angerNearbyChickensaurs(intimidateTarget,false);
             }
         }
 
