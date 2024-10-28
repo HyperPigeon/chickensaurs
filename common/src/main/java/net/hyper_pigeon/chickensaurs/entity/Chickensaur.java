@@ -28,6 +28,10 @@ import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.behavior.BehaviorUtils;
 import net.minecraft.world.entity.ai.memory.MemoryModuleType;
+import net.minecraft.world.entity.ai.navigation.GroundPathNavigation;
+import net.minecraft.world.entity.ai.navigation.PathNavigation;
+import net.minecraft.world.entity.ai.targeting.TargetingConditions;
+import net.minecraft.world.entity.animal.Chicken;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.monster.piglin.Piglin;
 import net.minecraft.world.entity.player.Player;
@@ -51,12 +55,14 @@ import net.tslat.smartbrainlib.api.core.behaviour.custom.look.LookAtTarget;
 import net.tslat.smartbrainlib.api.core.behaviour.custom.misc.Idle;
 import net.tslat.smartbrainlib.api.core.behaviour.custom.move.AvoidEntity;
 import net.tslat.smartbrainlib.api.core.behaviour.custom.move.FloatToSurfaceOfFluid;
+import net.tslat.smartbrainlib.api.core.behaviour.custom.move.FollowParent;
 import net.tslat.smartbrainlib.api.core.behaviour.custom.move.MoveToWalkTarget;
 import net.tslat.smartbrainlib.api.core.behaviour.custom.path.SetRandomWalkTarget;
 import net.tslat.smartbrainlib.api.core.behaviour.custom.path.SetWalkTargetToAttackTarget;
 import net.tslat.smartbrainlib.api.core.behaviour.custom.target.InvalidateAttackTarget;
 import net.tslat.smartbrainlib.api.core.behaviour.custom.target.SetRandomLookTarget;
 import net.tslat.smartbrainlib.api.core.behaviour.custom.target.TargetOrRetaliate;
+import net.tslat.smartbrainlib.api.core.navigation.SmoothGroundNavigation;
 import net.tslat.smartbrainlib.api.core.sensor.ExtendedSensor;
 import net.tslat.smartbrainlib.api.core.sensor.custom.GenericAttackTargetSensor;
 import net.tslat.smartbrainlib.api.core.sensor.custom.NearbyBlocksSensor;
@@ -103,6 +109,10 @@ public class Chickensaur extends TamableAnimal implements SmartBrainOwner<Chicke
         pBuilder.define(INTIMIDATING,false);
         pBuilder.define(INTIMIDATING_TICKS, 0);
         pBuilder.define(ATTACKING, false);
+    }
+
+    protected PathNavigation createNavigation(Level pLevel) {
+        return new SmoothGroundNavigation(this, pLevel);
     }
 
     @Override
@@ -446,7 +456,7 @@ public class Chickensaur extends TamableAnimal implements SmartBrainOwner<Chicke
                 new NearbyPlayersSensor<>(),
                 new NearbyLivingEntitySensor<Chickensaur>().setRadius(16).setPredicate((target,entity) -> {
                     EntityType<?> entityType = target.getType();
-                    return entityType.is(Constants.HUNT) || entityType.is(Constants.GROUP_HUNT) || entityType.is(Constants.INTIMIDATE);
+                    return (!target.is(entity) && entityType.equals(EntityRegistry.CHICKENSAUR)) || entityType.is(Constants.HUNT) || entityType.is(Constants.GROUP_HUNT) || entityType.is(Constants.INTIMIDATE);
                 }),
                 new HurtBySensor<>(),
                 new GenericAttackTargetSensor<>(),
@@ -464,6 +474,7 @@ public class Chickensaur extends TamableAnimal implements SmartBrainOwner<Chicke
                     EntityType<?> entityType = entity.getType();
                     return this.getHealth() < 5 && ((this.getLastAttacker() != null && this.getLastAttacker().is(entity)) || (entityType.is(Constants.INTIMIDATE) || entityType.is(Constants.GROUP_HUNT)));
                 }).speedModifier(1.2F).noCloserThan(8),
+                new FollowParent<Chickensaur>(),
                 new LookAtTarget<Chickensaur>().runFor(entity -> entity.getRandom().nextIntBetweenInclusive(40, 300)),                      // Have the entity turn to face and look at its current look target
                 new MoveToWalkTarget<Chickensaur>());                 // Walk towards the current walk target
     }
@@ -506,11 +517,22 @@ public class Chickensaur extends TamableAnimal implements SmartBrainOwner<Chicke
         return Mob.createMobAttributes().add(Attributes.MOVEMENT_SPEED, 0.37500001192092896).add(Attributes.MAX_HEALTH, 25.0).add(Attributes.ATTACK_DAMAGE, 8.0).add(Attributes.ARMOR, 12F).add(Attributes.FOLLOW_RANGE,16F);
     }
 
-    public static void angerNearbyChickensaurs(Player player, boolean angerOnlyIfCanSee) {
-        List<Chickensaur> list = player.level().getEntitiesOfClass(Chickensaur.class, player.getBoundingBox().inflate(16.0));
-        list.stream().filter(chickensaur -> !angerOnlyIfCanSee || BehaviorUtils.canSee(chickensaur,player)).forEach(chickensaur -> {
-            BrainUtils.setTargetOfEntity(chickensaur, player);
+    public static void angerNearbyChickensaurs(LivingEntity livingEntity, boolean angerOnlyIfCanSee) {
+        List<Chickensaur> list = livingEntity.level().getEntitiesOfClass(Chickensaur.class, livingEntity.getBoundingBox().inflate(16.0));
+        list.stream().filter(chickensaur -> !angerOnlyIfCanSee || BehaviorUtils.canSee(chickensaur,livingEntity)).forEach(chickensaur -> {
+            BrainUtils.setTargetOfEntity(chickensaur, livingEntity);
+            BrainUtils.clearMemory(chickensaur, MemoryModuleType.CANT_REACH_WALK_TARGET_SINCE);
         });
+    }
+
+    public static ServerPlayer imprintOnNearestPlayer(Chickensaur chickensaur) {
+        ServerPlayer serverPlayer = chickensaur.level().getNearestEntity(ServerPlayer.class, TargetingConditions.forNonCombat().range(6.0),chickensaur,
+                chickensaur.getX(),
+                chickensaur.getY(),
+                chickensaur.getZ(),
+                chickensaur.getBoundingBox().inflate(6.0, 2.0, 6.0));
+
+        return serverPlayer;
     }
 
 }
