@@ -1,0 +1,16 @@
+{
+  "entity.chickensaurs.chickensaur": "Chickensaur",
+  "itemGroup.chickensaurs.chickensaurs_items": "Chickensaurs",
+  "item.chickensaurs.chickensaur": "Raw Chickensaur",
+  "item.chickensaurs.cooked_chickensaur": "Cooked Chickensaur",
+  "item.chickensaurs.chickensaur_nuggets": "Chickensaur Nuggets",
+  "item.chickensaurs.chickensaur_spawn_egg": "Chickensaur Spawn Egg",
+  "block.chickensaurs.chickensaur_egg": "Chickensaur Egg",
+
+  "tag.chickensaurs.block.guarded_by_chickensaurs": "Guarded by Chickensaurs",
+  "tag.chickensaurs.entity_type.chickensur_group_hunt": "Chickensaurs group hunt",
+  "tag.chickensaurs.entity_type.chickensur_hunt": "Chickensaurs hunt",
+  "tag.chickensaurs.entity_type.chickensur_intimidate": "Chickensaurs intimidate",
+  "tag.chickensaurs.items.chickensaur_food": "Chickensaur Food",
+  "tag.chickensaurs.worldgen.biome.chickensaur_spawn_biomes": "Chickensaurs spawn in"
+}

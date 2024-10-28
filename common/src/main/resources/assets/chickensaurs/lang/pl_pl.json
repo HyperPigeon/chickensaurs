@@ -1,0 +1,16 @@
+{
+  "entity.chickensaurs.chickensaur": "Kurozaur",
+  "itemGroup.chickensaurs.chickensaurs_items": "Kurozaury",
+  "item.chickensaurs.chickensaur": "Surowy kurozaur",
+  "item.chickensaurs.cooked_chickensaur": "Pieczony kurozaur",
+  "item.chickensaurs.chickensaur_nuggets": "Kurozaurowe nuggetsy",
+  "item.chickensaurs.chickensaur_spawn_egg": "Jajo przyzywajce kurozaura",
+  "block.chickensaurs.chickensaur_egg": "Jajo kurozaura",
+
+  "tag.chickensaurs.block.guarded_by_chickensaurs": "Chronione przez kurozaury",
+  "tag.chickensaurs.entity_type.chickensur_group_hunt": "Kurozaury wspólnie polują na",
+  "tag.chickensaurs.entity_type.chickensur_hunt": "Kurozaury polują na",
+  "tag.chickensaurs.entity_type.chickensur_intimidate": "Kurozaury zastraszają",
+  "tag.chickensaurs.items.chickensaur_food": "Pokarm kurozaurów",
+  "tag.chickensaurs.worldgen.biome.chickensaur_spawn_biomes": "Kurozaury spawnują się w"
+}

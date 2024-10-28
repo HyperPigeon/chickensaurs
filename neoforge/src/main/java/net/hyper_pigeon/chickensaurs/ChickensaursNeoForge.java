@@ -49,9 +49,7 @@ public class ChickensaursNeoForge {
         MOB_EFFECTS.register(eventBus);
 
         eventBus.<EntityAttributeCreationEvent>addListener(event -> EntityRegistry.registerEntityAttributes(event::put));
-
-        // Use NeoForge to bootstrap the Common mod.
-        Constants.LOG.info("Hello NeoForge world!");
+        
         Chickensaurs.init();
 
     }

@@ -12,5 +12,6 @@ public class ChickensaursClientFabric implements ClientModInitializer {
     public void onInitializeClient() {
         ChickensaursClient.registerRenderers(EntityRendererRegistry::register, BlockEntityRenderers::register);
         EntityModelLayerRegistry.registerModelLayer(ChickensaurModel.LAYER_LOCATION, ChickensaurModel::createBodyLayer);
+
     }
 }

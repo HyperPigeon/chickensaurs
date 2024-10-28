@@ -1,0 +1,32 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_chickensaur": {
+      "conditions": {
+        "items": [
+          {
+            "items": "chickensaurs:cooked_chickensaur"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "chickensaurs:chickensaur_nuggets"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    }
+  },
+  "requirements": [
+    [
+      "has_the_recipe",
+      "has_chickensaur"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "chickensaurs:chickensaur_nuggets"
+    ]
+  }
+}
