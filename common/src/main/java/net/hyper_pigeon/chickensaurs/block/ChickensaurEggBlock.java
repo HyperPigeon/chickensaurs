@@ -8,6 +8,7 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
+import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.hyper_pigeon.chickensaurs.Constants;
 import net.minecraft.world.entity.player.Player;
@@ -22,11 +23,14 @@ import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import net.minecraft.world.level.material.MapColor;
 import net.minecraft.world.level.material.PushReaction;
 import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.phys.shapes.CollisionContext;
+import net.minecraft.world.phys.shapes.VoxelShape;
 
 public class ChickensaurEggBlock extends Block {
     private static final int HATCH_TIME_TICKS = 10000;
     private static final int MAX_HATCH_LEVEL = 1; // No intermediate hatching stages
     public static final IntegerProperty HATCH = BlockStateProperties.HATCH;
+    private static final VoxelShape SHAPE = Block.box(4,0,4,12,12,12);
 
     public ChickensaurEggBlock(Properties p_49795_) {
         super(p_49795_);
@@ -51,6 +55,11 @@ public class ChickensaurEggBlock extends Block {
 
     public static int getHatchLevel(BlockState pState) {
         return pState.getValue(HATCH);
+    }
+
+    @Override
+    public VoxelShape getShape(BlockState pState, BlockGetter pLevel, BlockPos pPos, CollisionContext pContext) {
+        return SHAPE;
     }
 
     @Override

@@ -4,9 +4,6 @@
   "package": "net.hyper_pigeon.chickensaurs.mixin",
   "compatibilityLevel": "JAVA_21",
   "mixins": [],
-  "client": [
-    "MixinTitleScreen"
-  ],
   "server": [],
   "injectors": {
     "defaultRequire": 1
