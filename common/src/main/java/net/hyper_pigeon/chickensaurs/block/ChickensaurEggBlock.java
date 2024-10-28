@@ -4,6 +4,7 @@ import net.hyper_pigeon.chickensaurs.entity.Chickensaur;
 import net.hyper_pigeon.chickensaurs.register.EntityRegistry;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
@@ -22,6 +23,7 @@ import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import net.minecraft.world.level.material.MapColor;
 import net.minecraft.world.level.material.PushReaction;
 import net.minecraft.world.phys.Vec3;
+
 
 public class ChickensaurEggBlock extends Block {
     private static final int HATCH_TIME_TICKS = 10000;
@@ -64,6 +66,10 @@ public class ChickensaurEggBlock extends Block {
                 chickensaur.setBaby(true);
                 chickensaur.moveTo(vec3.x(), vec3.y(), vec3.z(), Mth.wrapDegrees(pLevel.random.nextFloat() * 360.0F), 0.0F);
                 pLevel.addFreshEntity(chickensaur);
+                ServerPlayer serverPlayer = Chickensaur.imprintOnNearestPlayer(chickensaur);
+                if(serverPlayer != null) {
+                    chickensaur.setOwnerUUID(serverPlayer.getUUID());
+                }
             }
         } else {
             pLevel.setBlock(pPos, pState.setValue(HATCH, getHatchLevel(pState) + 1), 2);

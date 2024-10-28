@@ -30,6 +30,8 @@ import net.minecraft.world.entity.ai.behavior.BehaviorUtils;
 import net.minecraft.world.entity.ai.memory.MemoryModuleType;
 import net.minecraft.world.entity.ai.navigation.GroundPathNavigation;
 import net.minecraft.world.entity.ai.navigation.PathNavigation;
+import net.minecraft.world.entity.ai.targeting.TargetingConditions;
+import net.minecraft.world.entity.animal.Chicken;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.monster.piglin.Piglin;
 import net.minecraft.world.entity.player.Player;
@@ -521,6 +523,16 @@ public class Chickensaur extends TamableAnimal implements SmartBrainOwner<Chicke
             BrainUtils.setTargetOfEntity(chickensaur, livingEntity);
             BrainUtils.clearMemory(chickensaur, MemoryModuleType.CANT_REACH_WALK_TARGET_SINCE);
         });
+    }
+
+    public static ServerPlayer imprintOnNearestPlayer(Chickensaur chickensaur) {
+        ServerPlayer serverPlayer = chickensaur.level().getNearestEntity(ServerPlayer.class, TargetingConditions.forNonCombat().range(6.0),chickensaur,
+                chickensaur.getX(),
+                chickensaur.getY(),
+                chickensaur.getZ(),
+                chickensaur.getBoundingBox().inflate(6.0, 2.0, 6.0));
+
+        return serverPlayer;
     }
 
 }
