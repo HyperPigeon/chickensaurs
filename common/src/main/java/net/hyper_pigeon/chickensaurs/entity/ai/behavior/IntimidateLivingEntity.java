@@ -7,6 +7,7 @@ import net.hyper_pigeon.chickensaurs.entity.Chickensaur;
 import net.hyper_pigeon.chickensaurs.entity.ai.memory_types.ChickensaurMemoryTypes;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.entity.ai.Brain;
@@ -36,11 +37,16 @@ public class IntimidateLivingEntity<E extends PathfinderMob> extends ExtendedBeh
         return livingEntity.getType().is(Constants.INTIMIDATE) && !isInCreative;
     }
 
+    public boolean canIntimidatePossiblePlayer(LivingEntity target, Chickensaur chickensaur) {
+        return !(target.getType().equals(EntityType.PLAYER) && chickensaur.hasOwner());
+    }
+
+
     @Override
     protected boolean checkExtraStartConditions(ServerLevel level, E entity) {
         Optional<LivingEntity> livingEntity = BrainUtils.getMemory(entity, MemoryModuleType.NEAREST_VISIBLE_LIVING_ENTITIES).findClosest((livingEntity1) -> {
             double distanceToChickensaur = livingEntity1.distanceToSqr(entity);
-            return isIntimidateableEntity(livingEntity1) && distanceToChickensaur < 36 && distanceToChickensaur > 4;
+            return isIntimidateableEntity(livingEntity1) && canIntimidatePossiblePlayer(livingEntity1, (Chickensaur) entity) && ((Chickensaur)entity).hasOwner() && distanceToChickensaur < 36 && distanceToChickensaur > 4;
         });
         if (entity.getHealth() > 5 && livingEntity.isPresent() && intimidateTarget == null && !BrainUtils.hasMemory(entity,MemoryModuleType.ATTACK_TARGET)) {
             this.intimidateTarget = livingEntity.get();

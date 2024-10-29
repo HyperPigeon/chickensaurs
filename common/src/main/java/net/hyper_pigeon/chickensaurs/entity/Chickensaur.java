@@ -9,6 +9,7 @@ import net.hyper_pigeon.chickensaurs.register.EntityRegistry;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Vec3i;
 import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
@@ -16,6 +17,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
@@ -44,6 +46,7 @@ import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec2;
 import net.minecraft.world.phys.Vec3;
 import net.tslat.smartbrainlib.api.SmartBrainOwner;
 import net.tslat.smartbrainlib.api.core.BrainActivityGroup;
@@ -53,10 +56,7 @@ import net.tslat.smartbrainlib.api.core.behaviour.OneRandomBehaviour;
 import net.tslat.smartbrainlib.api.core.behaviour.custom.attack.AnimatableMeleeAttack;
 import net.tslat.smartbrainlib.api.core.behaviour.custom.look.LookAtTarget;
 import net.tslat.smartbrainlib.api.core.behaviour.custom.misc.Idle;
-import net.tslat.smartbrainlib.api.core.behaviour.custom.move.AvoidEntity;
-import net.tslat.smartbrainlib.api.core.behaviour.custom.move.FloatToSurfaceOfFluid;
-import net.tslat.smartbrainlib.api.core.behaviour.custom.move.FollowParent;
-import net.tslat.smartbrainlib.api.core.behaviour.custom.move.MoveToWalkTarget;
+import net.tslat.smartbrainlib.api.core.behaviour.custom.move.*;
 import net.tslat.smartbrainlib.api.core.behaviour.custom.path.SetRandomWalkTarget;
 import net.tslat.smartbrainlib.api.core.behaviour.custom.path.SetWalkTargetToAttackTarget;
 import net.tslat.smartbrainlib.api.core.behaviour.custom.target.InvalidateAttackTarget;
@@ -75,8 +75,9 @@ import net.tslat.smartbrainlib.util.EntityRetrievalUtil;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
+import java.util.UUID;
 
-public class Chickensaur extends TamableAnimal implements SmartBrainOwner<Chickensaur> {
+public class Chickensaur extends TamableAnimal implements SmartBrainOwner<Chickensaur>, Saddleable {
     public float flap;
     public float flapSpeed;
     public float oFlapSpeed;
@@ -89,8 +90,8 @@ public class Chickensaur extends TamableAnimal implements SmartBrainOwner<Chicke
 
     private static final EntityDataAccessor<Boolean> INTIMIDATING = SynchedEntityData.defineId(Chickensaur.class, EntityDataSerializers.BOOLEAN);
     private static final EntityDataAccessor<Integer> INTIMIDATING_TICKS = SynchedEntityData.defineId(Chickensaur.class, EntityDataSerializers.INT);
-
     private static final EntityDataAccessor<Boolean> ATTACKING = SynchedEntityData.defineId(Chickensaur.class, EntityDataSerializers.BOOLEAN);
+    private static final EntityDataAccessor<Boolean> SADDLED = SynchedEntityData.defineId(Chickensaur.class, EntityDataSerializers.BOOLEAN);
 
 
     public final AnimationState walkAnimationState = new AnimationState();
@@ -109,6 +110,7 @@ public class Chickensaur extends TamableAnimal implements SmartBrainOwner<Chicke
         pBuilder.define(INTIMIDATING,false);
         pBuilder.define(INTIMIDATING_TICKS, 0);
         pBuilder.define(ATTACKING, false);
+        pBuilder.define(SADDLED, false);
     }
 
     protected PathNavigation createNavigation(Level pLevel) {
@@ -315,10 +317,27 @@ public class Chickensaur extends TamableAnimal implements SmartBrainOwner<Chicke
             itemstack.hurtAndBreak(24, pPlayer, getSlotForHand(pHand));
             return InteractionResult.sidedSuccess(this.level().isClientSide);
         }
+        else if(itemstack.is(Items.BONE) && canTame()) {
+            setOwnerUUID(pPlayer.getUUID());
+            return InteractionResult.sidedSuccess(this.level().isClientSide);
+        }
+        else if (this.isSaddled() && !this.isVehicle() && !pPlayer.isSecondaryUseActive() && isChickensaurOwner(pPlayer)) {
+            if (!this.level().isClientSide) {
+                pPlayer.startRiding(this);
+            }
+
+            return InteractionResult.sidedSuccess(this.level().isClientSide);
+        }
+        else {
+            InteractionResult interactionresult = super.mobInteract(pPlayer, pHand);
+            if (!interactionresult.consumesAction()) {
+                return itemstack.is(Items.SADDLE) ? itemstack.interactLivingEntity(pPlayer, this, pHand) : InteractionResult.PASS;
+            } else {
+                return interactionresult;
+            }
+        }
         /*we'll probably have to add a clause here that prevents the player from brushing the chickensaur if its aggressive (though it might be
         funny if we don't)*/
-
-        return super.mobInteract(pPlayer, pHand);
     }
 
     private boolean brushOffIronNuggets() {
@@ -330,6 +349,18 @@ public class Chickensaur extends TamableAnimal implements SmartBrainOwner<Chicke
             this.playSound(SoundEvents.ARMADILLO_BRUSH);
             return true;
         }
+    }
+
+    private boolean canTame(){
+        return isBaby() && getOwner() == null;
+    }
+
+    public boolean hasOwner(){
+        return getOwner() != null;
+    }
+
+    private boolean isChickensaurOwner(LivingEntity livingEntity) {
+        return hasOwner() && this.getOwnerUUID().equals(livingEntity.getUUID());
     }
 
     protected float getBlockSpeedFactor() {
@@ -390,10 +421,14 @@ public class Chickensaur extends TamableAnimal implements SmartBrainOwner<Chicke
         return this.entityData.get(ATTACKING);
     }
 
+    public boolean canAttackTooClosePossiblePlayer(LivingEntity target) {
+        return !(target.getType().equals(EntityType.PLAYER) && hasOwner());
+    }
+
     public boolean canAttackTarget(LivingEntity target) {
         EntityType<?> type = target.getType();
         if(!target.isDeadOrDying() && !target.isRemoved()) {
-            if(target instanceof ServerPlayer player && player.isCreative()) {
+            if(target instanceof ServerPlayer player && (player.isCreative() || isChickensaurOwner(player))) {
                 return false;
             }
             else if(type.is(Constants.HUNT)) {
@@ -405,7 +440,7 @@ public class Chickensaur extends TamableAnimal implements SmartBrainOwner<Chicke
                     Entity revengeTarget = damageSource.getEntity();
                     return revengeTarget != null && revengeTarget.is(target);
                 }
-                else if(type.is(Constants.INTIMIDATE) && this.distanceToSqr(target) < 4) {
+                else if(type.is(Constants.INTIMIDATE) && canAttackTooClosePossiblePlayer(target) && this.distanceToSqr(target) < 4) {
                     return true;
                 }
                 else if(type.is(Constants.GROUP_HUNT)) {
@@ -474,7 +509,10 @@ public class Chickensaur extends TamableAnimal implements SmartBrainOwner<Chicke
                     EntityType<?> entityType = entity.getType();
                     return this.getHealth() < 5 && ((this.getLastAttacker() != null && this.getLastAttacker().is(entity)) || (entityType.is(Constants.INTIMIDATE) || entityType.is(Constants.GROUP_HUNT)));
                 }).speedModifier(1.2F).noCloserThan(8),
-                new FollowParent<Chickensaur>(),
+                new FollowParent<Chickensaur>().parentPredicate((entity, other) -> {
+                    UUID ownerUUID = entity.getOwnerUUID();
+                    return (ownerUUID != null && ownerUUID.equals(other.getUUID())) || entity.getClass() == other.getClass() && other.getAge() >= 0;
+                }),
                 new LookAtTarget<Chickensaur>().runFor(entity -> entity.getRandom().nextIntBetweenInclusive(40, 300)),                      // Have the entity turn to face and look at its current look target
                 new MoveToWalkTarget<Chickensaur>());                 // Walk towards the current walk target
     }
@@ -485,13 +523,13 @@ public class Chickensaur extends TamableAnimal implements SmartBrainOwner<Chicke
                 new EatFoodInMainHand<>().runFor((entity) -> 100),
                 new FirstApplicableBehaviour(
                         new TargetOrRetaliate<Chickensaur>().alertAlliesWhen((owner, attacker) ->  {
-                            return attacker != null && owner.canAttackTarget((LivingEntity) attacker) ;
+                            return attacker != null && owner.canAttackTarget((LivingEntity) attacker);
                         }).attackablePredicate(this::canAttackTarget),
                         new IntimidateLivingEntity<Chickensaur>().runFor((entity) -> 200),
                         new MoveToNearestVisibleWantedItem<Chickensaur>().cooldownFor((entity) -> 100),
                         new OneRandomBehaviour(
                                 new SetRandomLookTarget<Chickensaur>(),
-                                new SetRandomWalkTarget<Chickensaur>().setRadius(3).speedModifier(1.0F).cooldownFor((entity) -> 150),
+                                new SetRandomWalkTarget<Chickensaur>().setRadius(3).speedModifier(0.75F).cooldownFor((entity) -> 150),
                                 new Idle<>().runFor(entity -> entity.getRandom().nextIntBetweenInclusive(30,60))
                         )
                 )
@@ -519,7 +557,7 @@ public class Chickensaur extends TamableAnimal implements SmartBrainOwner<Chicke
 
     public static void angerNearbyChickensaurs(LivingEntity livingEntity, boolean angerOnlyIfCanSee) {
         List<Chickensaur> list = livingEntity.level().getEntitiesOfClass(Chickensaur.class, livingEntity.getBoundingBox().inflate(16.0));
-        list.stream().filter(chickensaur -> !angerOnlyIfCanSee || BehaviorUtils.canSee(chickensaur,livingEntity)).forEach(chickensaur -> {
+        list.stream().filter(chickensaur -> (!angerOnlyIfCanSee || BehaviorUtils.canSee(chickensaur,livingEntity)) && !chickensaur.isChickensaurOwner(livingEntity)).forEach(chickensaur -> {
             BrainUtils.setTargetOfEntity(chickensaur, livingEntity);
             BrainUtils.clearMemory(chickensaur, MemoryModuleType.CANT_REACH_WALK_TARGET_SINCE);
         });
@@ -535,4 +573,78 @@ public class Chickensaur extends TamableAnimal implements SmartBrainOwner<Chicke
         return serverPlayer;
     }
 
+    public LivingEntity getControllingPassenger() {
+        if (this.isSaddled()) {
+            Entity entity = this.getFirstPassenger();
+            if (entity instanceof Player player && isChickensaurOwner(player)) {
+                return (Player)entity;
+            }
+        }
+
+        return super.getControllingPassenger();
+    }
+
+    protected Vec2 getRiddenRotation(LivingEntity pEntity) {
+        return new Vec2(pEntity.getXRot() * 0.5F, pEntity.getYRot());
+    }
+
+    protected void tickRidden(Player pPlayer, Vec3 pTravelVector) {
+        super.tickRidden(pPlayer, pTravelVector);
+        Vec2 vec2 = this.getRiddenRotation(pPlayer);
+        this.setRot(vec2.y, vec2.x);
+        this.yRotO = this.yBodyRot = this.yHeadRot = this.getYRot();
+    }
+
+    protected Vec3 getRiddenInput(Player pPlayer, Vec3 pTravelVector) {
+        float f = pPlayer.xxa * 0.5F;
+        float f1 = pPlayer.zza;
+        if (f1 <= 0.0F) {
+            f1 *= 0.25F;
+        }
+
+        return new Vec3((double)f, 0.0, (double)f1);
+    }
+
+    protected float getRiddenSpeed(Player pPlayer) {
+        return (float)this.getAttributeValue(Attributes.MOVEMENT_SPEED);
+    }
+
+    protected Vec3 getPassengerAttachmentPoint(Entity pEntity, EntityDimensions pDimensions, float pPartialTick) {
+        return super.getPassengerAttachmentPoint(pEntity, pDimensions, pPartialTick);
+    }
+
+    @Override
+    public boolean isSaddleable() {
+        return this.isAlive() && !this.isBaby() && this.hasOwner();
+    }
+
+    @Override
+    public void equipSaddle(ItemStack itemStack, @Nullable SoundSource soundSource) {
+        this.entityData.set(SADDLED,true);
+    }
+
+    @Override
+    public boolean isSaddled() {
+        return this.entityData.get(SADDLED);
+    }
+
+    public void setSaddled(boolean is_saddled){
+        this.entityData.set(SADDLED,is_saddled);
+    }
+
+    public void addAdditionalSaveData(CompoundTag pCompound) {
+        super.addAdditionalSaveData(pCompound);
+        pCompound.putBoolean("intimidating",isIntimidating());
+        pCompound.putInt("intimidatingTicks",getIntimidatingTicks());
+        pCompound.putBoolean("saddled",isSaddled());
+
+    }
+
+    public void readAdditionalSaveData(CompoundTag pCompound) {
+        super.readAdditionalSaveData(pCompound);
+        setIntimidating(pCompound.getBoolean("intimidating"));
+        setIntimidatingTicks(pCompound.getInt("intimidatingTicks"));
+        setSaddled(pCompound.getBoolean("saddled"));
+
+    }
 }
