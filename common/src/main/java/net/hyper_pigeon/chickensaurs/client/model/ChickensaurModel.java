@@ -16,7 +16,7 @@ import net.minecraft.util.Mth;
 public class ChickensaurModel extends HierarchicalModel<Chickensaur> {
     // This layer location should be baked with EntityRendererProvider.Context in the entity renderer and passed into this model's constructor
     public static final ModelLayerLocation LAYER_LOCATION = new ModelLayerLocation(ResourceLocation.fromNamespaceAndPath(Constants.MOD_ID, "chickensaur"), "main");
-
+    public static final ModelLayerLocation SADDLE_LAYER_LOCATION = new ModelLayerLocation(ResourceLocation.fromNamespaceAndPath(Constants.MOD_ID, "chickensaur_saddle"), "saddle");
     private final ModelPart root;
     private final ModelPart upper;
     private final ModelPart neck;
@@ -66,7 +66,7 @@ public class ChickensaurModel extends HierarchicalModel<Chickensaur> {
 
         PartDefinition neckd = neck.addOrReplaceChild("neckd", CubeListBuilder.create(), PartPose.offset(0.0F, 0.0F, 0.0F));
 
-        PartDefinition cube_r2 = neckd.addOrReplaceChild("cube_r2", CubeListBuilder.create().texOffs(21, 11).addBox(-2.0F, -4.6579F, -1.9674F, 4.0F, 5.0F, 3.0F, new CubeDeformation(0.0F)), PartPose.offsetAndRotation(0.0F, 2.0F, 2.0F, 0.4363F, 0.0F, 0.0F));
+        PartDefinition cube_r2 = neckd.addOrReplaceChild("cube_r2", CubeListBuilder.create().texOffs(35, 11).addBox(-2.0F, -4.6579F, -1.9674F, 4.0F, 5.0F, 3.0F, new CubeDeformation(0.0F)), PartPose.offsetAndRotation(0.0F, 2.0F, 2.0F, 0.4363F, 0.0F, 0.0F));
 
         PartDefinition head = upper.addOrReplaceChild("head", CubeListBuilder.create().texOffs(0, 0).addBox(-3.0F, -6.0F, -3.0F, 6.0F, 6.0F, 6.0F, new CubeDeformation(0.0F))
                 .texOffs(0, 12).addBox(-1.5F, -7.0F, -6.0F, 3.0F, 2.0F, 6.0F, new CubeDeformation(0.0F))

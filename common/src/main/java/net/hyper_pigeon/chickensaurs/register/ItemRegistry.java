@@ -30,7 +30,7 @@ public final class ItemRegistry {
 
     public static final Supplier<CreativeModeTab> CHICKENSAURS_TAB = Services.PLATFORM.registerCreativeModeTab("chickensaurs_items", () -> Services.PLATFORM.newCreativeTabBuilder()
             .title(Component.translatable("itemGroup." + Constants.MOD_ID + ".chickensaurs_items"))
-            .icon(() -> new ItemStack(CHICKENSAUR_EGG.get()))
+            .icon(() -> new ItemStack(CHICKENSAUR_NUGGETS.get()))
             .displayItems((enabledFeatures, entries) -> {
                 entries.accept(CHICKENSAUR_EGG.get());
                 entries.accept(CHICKENSAUR_SPAWN_EGG.get());
