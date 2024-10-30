@@ -509,10 +509,7 @@ public class Chickensaur extends TamableAnimal implements SmartBrainOwner<Chicke
                     EntityType<?> entityType = entity.getType();
                     return this.getHealth() < 5 && ((this.getLastAttacker() != null && this.getLastAttacker().is(entity)) || (entityType.is(Constants.INTIMIDATE) || entityType.is(Constants.GROUP_HUNT)));
                 }).speedModifier(1.2F).noCloserThan(8),
-                new FollowParent<Chickensaur>().parentPredicate((entity, other) -> {
-                    UUID ownerUUID = entity.getOwnerUUID();
-                    return (ownerUUID != null && ownerUUID.equals(other.getUUID())) || entity.getClass() == other.getClass() && other.getAge() >= 0;
-                }),
+                new FollowParent<Chickensaur>().startCondition((entity) -> !hasOwner()),
                 new LookAtTarget<Chickensaur>().runFor(entity -> entity.getRandom().nextIntBetweenInclusive(40, 300)),                      // Have the entity turn to face and look at its current look target
                 new MoveToWalkTarget<Chickensaur>());                 // Walk towards the current walk target
     }
@@ -610,7 +607,7 @@ public class Chickensaur extends TamableAnimal implements SmartBrainOwner<Chicke
     }
 
     protected Vec3 getPassengerAttachmentPoint(Entity pEntity, EntityDimensions pDimensions, float pPartialTick) {
-        return super.getPassengerAttachmentPoint(pEntity, pDimensions, pPartialTick);
+        return super.getPassengerAttachmentPoint(pEntity, pDimensions, pPartialTick).add(0.0, -0.15F*pPartialTick, (-0.5 * pPartialTick)).yRot(-this.getYRot() * 0.017453292F);
     }
 
     @Override
