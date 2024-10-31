@@ -17,6 +17,9 @@ public class ChickensaurModel extends HierarchicalModel<Chickensaur> {
     // This layer location should be baked with EntityRendererProvider.Context in the entity renderer and passed into this model's constructor
     public static final ModelLayerLocation LAYER_LOCATION = new ModelLayerLocation(ResourceLocation.fromNamespaceAndPath(Constants.MOD_ID, "chickensaur"), "main");
     public static final ModelLayerLocation SADDLE_LAYER_LOCATION = new ModelLayerLocation(ResourceLocation.fromNamespaceAndPath(Constants.MOD_ID, "chickensaur_saddle"), "saddle");
+    public static final ModelLayerLocation BRUSHED_LAYER_LOCATION = new ModelLayerLocation(ResourceLocation.fromNamespaceAndPath(Constants.MOD_ID, "chickensaur_brushed"), "main");
+
+
     private final ModelPart root;
     private final ModelPart upper;
     private final ModelPart neck;

@@ -44,6 +44,8 @@ public class EatFoodInMainHand<E extends PathfinderMob> extends ExtendedBehaviou
         pLevel.playSound(null, chickensaur.getX(), chickensaur.getY(), chickensaur.getZ(), chickensaur.getEatingSound(pFood), SoundSource.NEUTRAL, 1.0F, 1.0F + (pLevel.random.nextFloat() - pLevel.random.nextFloat()) * 0.4F);
         pFood.consume(1, chickensaur);
         chickensaur.gameEvent(GameEvent.EAT);
+        chickensaur.setBrushAmount(3);
+        chickensaur.setRegenScalesTicks(0);
         return pFood;
     }
 }
