@@ -279,7 +279,7 @@ public class Chickensaur extends TamableAnimal implements SmartBrainOwner<Chicke
 
     protected AABB getAttackBoundingBox() {
         AABB aABB = super.getAttackBoundingBox();
-        return aABB.inflate(0.5, 0.0, 0.5);
+        return aABB.inflate(0.6, 0.1, 0.6);
     }
 
     public InteractionResult mobInteract(Player pPlayer, InteractionHand pHand) {
@@ -290,6 +290,14 @@ public class Chickensaur extends TamableAnimal implements SmartBrainOwner<Chicke
         }
         else if(itemstack.is(Items.BONE) && canTame()) {
             setOwnerUUID(pPlayer.getUUID());
+
+            for(int i = 0; i < 7; ++i) {
+                double d0 = this.random.nextGaussian() * 0.02;
+                double d1 = this.random.nextGaussian() * 0.02;
+                double d2 = this.random.nextGaussian() * 0.02;
+                this.level().addParticle(ParticleTypes.HEART, this.getRandomX(1.0), this.getRandomY() + 0.5, this.getRandomZ(1.0), d0, d1, d2);
+            }
+
             return InteractionResult.sidedSuccess(this.level().isClientSide);
         }
         else if (this.isSaddled() && !this.isVehicle() && !pPlayer.isSecondaryUseActive() && isChickensaurOwner(pPlayer)) {
@@ -310,6 +318,7 @@ public class Chickensaur extends TamableAnimal implements SmartBrainOwner<Chicke
         /*we'll probably have to add a clause here that prevents the player from brushing the chickensaur if its aggressive (though it might be
         funny if we don't)*/
     }
+
 
     private boolean brushOffIronNuggets() {
         int brushAmount = getBrushAmount();
@@ -423,6 +432,20 @@ public class Chickensaur extends TamableAnimal implements SmartBrainOwner<Chicke
             else if(type.is(Constants.HUNT)) {
                 return true;
             }
+            else if(hasOwner()) {
+                LivingEntity owner = getOwner();
+                if(owner != null && owner.isAlive()) {
+                    LivingEntity ownerHurtByTarget = owner.getLastHurtByMob();
+                    if(ownerHurtByTarget != null && ownerHurtByTarget.isAlive()) {
+                        return target.is(ownerHurtByTarget);
+                    }
+
+                    LivingEntity ownerHurtTarget = owner.getLastHurtMob();
+                    if(ownerHurtTarget != null && ownerHurtTarget.isAlive()) {
+                        return target.is(ownerHurtTarget);
+                    }
+                }
+            }
             else if(this.getHealth() >= 5) {
                 DamageSource damageSource = this.getLastDamageSource();
                 if(damageSource != null) {
@@ -478,10 +501,7 @@ public class Chickensaur extends TamableAnimal implements SmartBrainOwner<Chicke
     public List<? extends ExtendedSensor<? extends Chickensaur>> getSensors() {
         return ObjectArrayList.of(
                 new NearbyPlayersSensor<>(),
-                new NearbyLivingEntitySensor<Chickensaur>().setRadius(16).setPredicate((target,entity) -> {
-                    EntityType<?> entityType = target.getType();
-                    return (!target.is(entity) && entityType.equals(EntityRegistry.CHICKENSAUR)) || entityType.is(Constants.HUNT) || entityType.is(Constants.GROUP_HUNT) || entityType.is(Constants.INTIMIDATE);
-                }),
+                new NearbyLivingEntitySensor<Chickensaur>().setRadius(16),
                 new HurtBySensor<>(),
                 new GenericAttackTargetSensor<>(),
                 new NearestItemSensor<Chickensaur>().
