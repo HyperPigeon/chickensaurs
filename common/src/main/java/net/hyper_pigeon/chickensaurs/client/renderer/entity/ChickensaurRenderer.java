@@ -14,6 +14,8 @@ public class ChickensaurRenderer extends MobRenderer<Chickensaur, ChickensaurMod
 
     private static final ResourceLocation DEFAULT = ResourceLocation.fromNamespaceAndPath(Constants.MOD_ID,"textures/entity/chickensaur/chickensaur.png");
     private static final ResourceLocation SADDLE = ResourceLocation.fromNamespaceAndPath(Constants.MOD_ID,"textures/entity/chickensaur/chickensaur_saddle.png");
+    private static final ResourceLocation BRUSHED = ResourceLocation.fromNamespaceAndPath(Constants.MOD_ID, "textures/entity/chickensaur/chickensaur_brushed.png");
+
     public ChickensaurRenderer(EntityRendererProvider.Context pContext) {
         super(pContext, new ChickensaurModel(pContext.bakeLayer(ChickensaurModel.LAYER_LOCATION)), 0.5f);
         this.addLayer(
@@ -25,6 +27,10 @@ public class ChickensaurRenderer extends MobRenderer<Chickensaur, ChickensaurMod
 
     @Override
     public ResourceLocation getTextureLocation(Chickensaur chickensaur) {
+        if(chickensaur.getBrushAmount() <= 0) {
+            return BRUSHED;
+        }
         return DEFAULT;
+
     }
 }
