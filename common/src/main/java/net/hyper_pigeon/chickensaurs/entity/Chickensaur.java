@@ -6,6 +6,7 @@ import net.hyper_pigeon.chickensaurs.entity.ai.behavior.EatFoodInMainHand;
 import net.hyper_pigeon.chickensaurs.entity.ai.behavior.IntimidateLivingEntity;
 import net.hyper_pigeon.chickensaurs.entity.ai.behavior.MoveToNearestVisibleWantedItem;
 import net.hyper_pigeon.chickensaurs.register.EntityRegistry;
+import net.hyper_pigeon.chickensaurs.register.ItemRegistry;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Vec3i;
 import net.minecraft.core.particles.ParticleTypes;
@@ -34,6 +35,7 @@ import net.minecraft.world.entity.ai.memory.MemoryModuleType;
 import net.minecraft.world.entity.ai.navigation.GroundPathNavigation;
 import net.minecraft.world.entity.ai.navigation.PathNavigation;
 import net.minecraft.world.entity.ai.targeting.TargetingConditions;
+import net.minecraft.world.entity.animal.Animal;
 import net.minecraft.world.entity.animal.Chicken;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.monster.piglin.Piglin;
@@ -43,6 +45,7 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.level.*;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.gameevent.GameEvent;
+import net.minecraft.world.level.pathfinder.PathType;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec2;
 import net.minecraft.world.phys.Vec3;
@@ -53,6 +56,7 @@ import net.tslat.smartbrainlib.api.core.behaviour.FirstApplicableBehaviour;
 import net.tslat.smartbrainlib.api.core.behaviour.OneRandomBehaviour;
 import net.tslat.smartbrainlib.api.core.behaviour.custom.attack.AnimatableMeleeAttack;
 import net.tslat.smartbrainlib.api.core.behaviour.custom.look.LookAtTarget;
+import net.tslat.smartbrainlib.api.core.behaviour.custom.misc.BreedWithPartner;
 import net.tslat.smartbrainlib.api.core.behaviour.custom.misc.Idle;
 import net.tslat.smartbrainlib.api.core.behaviour.custom.move.*;
 import net.tslat.smartbrainlib.api.core.behaviour.custom.path.SetRandomWalkTarget;
@@ -105,6 +109,8 @@ public class Chickensaur extends TamableAnimal implements SmartBrainOwner<Chicke
     public Chickensaur(EntityType<? extends TamableAnimal> pEntityType, Level pLevel) {
         super(pEntityType, pLevel);
         this.shedTime = this.random.nextInt(3000) + 3000;
+        this.setPathfindingMalus(PathType.DANGER_FIRE, 0.0F);
+        this.setPathfindingMalus(PathType.DAMAGE_FIRE, 0.0F);
     }
 
     @Override
@@ -221,6 +227,12 @@ public class Chickensaur extends TamableAnimal implements SmartBrainOwner<Chicke
             }
         }
 
+        if (!this.level().isClientSide && this.isAlive()) {
+            if (this.random.nextInt(900) == 0 && this.deathTime == 0) {
+                this.heal(1.0F);
+            }
+        }
+
     }
 
     protected boolean isFlapping() {
@@ -288,33 +300,39 @@ public class Chickensaur extends TamableAnimal implements SmartBrainOwner<Chicke
             itemstack.hurtAndBreak(24, pPlayer, getSlotForHand(pHand));
             return InteractionResult.sidedSuccess(this.level().isClientSide);
         }
-        else if(itemstack.is(Items.BONE) && canTame()) {
-            setOwnerUUID(pPlayer.getUUID());
+        else if(canTame()) {
+            if(isFood(itemstack)) {
+                setOwnerUUID(pPlayer.getUUID());
 
-            for(int i = 0; i < 7; ++i) {
-                double d0 = this.random.nextGaussian() * 0.02;
-                double d1 = this.random.nextGaussian() * 0.02;
-                double d2 = this.random.nextGaussian() * 0.02;
-                this.level().addParticle(ParticleTypes.HEART, this.getRandomX(1.0), this.getRandomY() + 0.5, this.getRandomZ(1.0), d0, d1, d2);
+                for(int i = 0; i < 7; ++i) {
+                    double d0 = this.random.nextGaussian() * 0.02;
+                    double d1 = this.random.nextGaussian() * 0.02;
+                    double d2 = this.random.nextGaussian() * 0.02;
+                    this.level().addParticle(ParticleTypes.HEART, this.getRandomX(1.0), this.getRandomY() + 0.5, this.getRandomZ(1.0), d0, d1, d2);
+                }
+
+                return InteractionResult.sidedSuccess(this.level().isClientSide);
             }
-
-            return InteractionResult.sidedSuccess(this.level().isClientSide);
         }
-        else if (this.isSaddled() && !this.isVehicle() && !pPlayer.isSecondaryUseActive() && isChickensaurOwner(pPlayer)) {
-            if (!this.level().isClientSide) {
-                pPlayer.startRiding(this);
+        else if(isChickensaurOwner(pPlayer)) {
+            if (this.isSaddled() && !this.isVehicle() && !pPlayer.isSecondaryUseActive()) {
+                if (!this.level().isClientSide) {
+                    pPlayer.startRiding(this);
+                }
+
+                return InteractionResult.sidedSuccess(this.level().isClientSide);
             }
-
-            return InteractionResult.sidedSuccess(this.level().isClientSide);
-        }
-        else {
-            InteractionResult interactionresult = super.mobInteract(pPlayer, pHand);
-            if (!interactionresult.consumesAction()) {
-                return itemstack.is(Items.SADDLE) ? itemstack.interactLivingEntity(pPlayer, this, pHand) : InteractionResult.PASS;
-            } else {
+            else {
+                InteractionResult interactionresult = super.mobInteract(pPlayer, pHand);
+                if (!interactionresult.consumesAction()) {
+                    return itemstack.is(Items.SADDLE) ? itemstack.interactLivingEntity(pPlayer, this, pHand) : InteractionResult.PASS;
+                }
                 return interactionresult;
             }
         }
+
+        return InteractionResult.FAIL;
+
         /*we'll probably have to add a clause here that prevents the player from brushing the chickensaur if its aggressive (though it might be
         funny if we don't)*/
     }
@@ -380,7 +398,8 @@ public class Chickensaur extends TamableAnimal implements SmartBrainOwner<Chicke
 
     public boolean hasNumbersAdvantaqe(LivingEntity potentialPrey) {
         double hunterFollowRange = this.getAttributeValue(Attributes.FOLLOW_RANGE);
-        int numHunterAllies =  EntityRetrievalUtil.getEntities(this, hunterFollowRange, 10.0, hunterFollowRange, LivingEntity.class, (entity) -> entity.getType().equals(EntityRegistry.CHICKENSAUR.get())).size();
+        int numHunterAllies =  EntityRetrievalUtil.getEntities(this, hunterFollowRange, 10.0, hunterFollowRange, LivingEntity.class, (entity) -> entity.getType().equals(EntityRegistry.CHICKENSAUR.get())
+                && ((Chickensaur)entity).isTame()).size();
         double preyFollowRange = this.getAttributeValue(Attributes.FOLLOW_RANGE);
         int numPreyAllies = EntityRetrievalUtil.getEntities(this, hunterFollowRange, 10.0, preyFollowRange, LivingEntity.class, (entity) -> entity.getType().equals(potentialPrey.getType())).size();
 
@@ -429,10 +448,8 @@ public class Chickensaur extends TamableAnimal implements SmartBrainOwner<Chicke
             if(target instanceof ServerPlayer player && (player.isCreative() || isChickensaurOwner(player))) {
                 return false;
             }
-            else if(type.is(Constants.HUNT)) {
-                return true;
-            }
-            else if(hasOwner()) {
+
+            if(hasOwner()) {
                 LivingEntity owner = getOwner();
                 if(owner != null && owner.isAlive()) {
                     LivingEntity ownerHurtByTarget = owner.getLastHurtByMob();
@@ -445,6 +462,10 @@ public class Chickensaur extends TamableAnimal implements SmartBrainOwner<Chicke
                         return target.is(ownerHurtTarget);
                     }
                 }
+            }
+
+            if(type.is(Constants.HUNT)) {
+                return true;
             }
             else if(this.getHealth() >= 5) {
                 DamageSource damageSource = this.getLastDamageSource();
@@ -486,6 +507,15 @@ public class Chickensaur extends TamableAnimal implements SmartBrainOwner<Chicke
         }
     }
 
+    public void spawnChildFromBreeding(ServerLevel pLevel, Animal pMate) {
+        ItemStack itemstack = new ItemStack(ItemRegistry.CHICKENSAUR_EGG.get());
+        ItemEntity itementity = new ItemEntity(pLevel, this.position().x(), this.position().y(), this.position().z(), itemstack);
+        itementity.setDefaultPickUpDelay();
+        this.finalizeSpawnChildFromBreeding(pLevel, pMate, (AgeableMob)null);
+        this.playSound(SoundEvents.SNIFFER_EGG_PLOP, 1.0F, (this.random.nextFloat() - this.random.nextFloat()) * 0.2F + 0.5F);
+        pLevel.addFreshEntity(itementity);
+    }
+
 
     @Override
     protected Brain.Provider<?> brainProvider() {
@@ -516,7 +546,7 @@ public class Chickensaur extends TamableAnimal implements SmartBrainOwner<Chicke
                 new FloatToSurfaceOfFluid<Chickensaur>(),              // Have the entity float to the surface of a fluid
                 new AvoidEntity<Chickensaur>().avoiding((entity) -> {
                     EntityType<?> entityType = entity.getType();
-                    return this.getHealth() < 5 && ((this.getLastAttacker() != null && this.getLastAttacker().is(entity)) || (entityType.is(Constants.INTIMIDATE) || entityType.is(Constants.GROUP_HUNT)));
+                    return this.getHealth() < 5 && !this.isChickensaurOwner(entity) && ((this.getLastAttacker() != null && this.getLastAttacker().is(entity)) || (entityType.is(Constants.INTIMIDATE) || entityType.is(Constants.GROUP_HUNT)));
                 }).speedModifier(1.2F).noCloserThan(8),
                 new EatFoodInMainHand<>().runFor((entity) -> 100),
                 new FollowParent<Chickensaur>().startCondition((entity) -> !hasOwner()),
@@ -531,11 +561,12 @@ public class Chickensaur extends TamableAnimal implements SmartBrainOwner<Chicke
                         new TargetOrRetaliate<Chickensaur>().alertAlliesWhen((owner, attacker) ->  {
                             return attacker != null && owner.canAttackTarget((LivingEntity) attacker);
                         }).attackablePredicate(this::canAttackTarget),
-                        new IntimidateLivingEntity<Chickensaur>().runFor((entity) -> 200),
+                        new IntimidateLivingEntity<Chickensaur>().runFor((entity) -> 200).startCondition((entity) -> !entity.hasOwner() && !entity.isBaby()),
                         new MoveToNearestVisibleWantedItem<Chickensaur>().cooldownFor((entity) -> 100),
+                        new BreedWithPartner<Chickensaur>(),
                         new OneRandomBehaviour(
                                 new SetRandomLookTarget<Chickensaur>(),
-                                new SetRandomWalkTarget<Chickensaur>().setRadius(3).speedModifier(0.75F).cooldownFor((entity) -> 150),
+                                new SetRandomWalkTarget<Chickensaur>().setRadius(5).speedModifier(0.75F).cooldownFor((entity) -> 150),
                                 new Idle<>().runFor(entity -> entity.getRandom().nextIntBetweenInclusive(30,60))
                         )
                 )
@@ -558,7 +589,10 @@ public class Chickensaur extends TamableAnimal implements SmartBrainOwner<Chicke
     }
 
     public static AttributeSupplier.Builder createAttributes() {
-        return Mob.createMobAttributes().add(Attributes.MOVEMENT_SPEED, 0.37500001192092896).add(Attributes.MAX_HEALTH, 25.0).add(Attributes.ATTACK_DAMAGE, 8.0).add(Attributes.ARMOR, 12F).add(Attributes.FOLLOW_RANGE,16F);
+        return Mob.createMobAttributes().add(Attributes.MOVEMENT_SPEED, 0.37500001192092896)
+                .add(Attributes.MAX_HEALTH, 25.0).add(Attributes.ATTACK_DAMAGE, 8.0)
+                .add(Attributes.ARMOR, 12F)
+                .add(Attributes.FOLLOW_RANGE,16F);
     }
 
     public static void angerNearbyChickensaurs(LivingEntity livingEntity, boolean angerOnlyIfCanSee) {

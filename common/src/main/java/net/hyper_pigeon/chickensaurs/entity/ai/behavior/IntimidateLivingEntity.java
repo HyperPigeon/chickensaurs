@@ -46,7 +46,7 @@ public class IntimidateLivingEntity<E extends PathfinderMob> extends ExtendedBeh
     protected boolean checkExtraStartConditions(ServerLevel level, E entity) {
         Optional<LivingEntity> livingEntity = BrainUtils.getMemory(entity, MemoryModuleType.NEAREST_VISIBLE_LIVING_ENTITIES).findClosest((livingEntity1) -> {
             double distanceToChickensaur = livingEntity1.distanceToSqr(entity);
-            return isIntimidateableEntity(livingEntity1) && canIntimidatePossiblePlayer(livingEntity1, (Chickensaur) entity) && ((Chickensaur)entity).hasOwner() && distanceToChickensaur < 36 && distanceToChickensaur > 4;
+            return isIntimidateableEntity(livingEntity1) && distanceToChickensaur < 36 && distanceToChickensaur > 4;
         });
         if (entity.getHealth() > 5 && livingEntity.isPresent() && intimidateTarget == null && !BrainUtils.hasMemory(entity,MemoryModuleType.ATTACK_TARGET)) {
             this.intimidateTarget = livingEntity.get();
