@@ -25,6 +25,7 @@ public class ChickensaursNeoForgeClient {
         event.registerLayerDefinition(ChickensaurModel.LAYER_LOCATION, ChickensaurModel::createBodyLayer);
         event.registerLayerDefinition(ChickensaurModel.SADDLE_LAYER_LOCATION, ChickensaurModel::createBodyLayer);
         event.registerLayerDefinition(ChickensaurModel.BRUSHED_LAYER_LOCATION, ChickensaurModel::createBodyLayer);
+        event.registerLayerDefinition(ChickensaurModel.BAND_LAYER_LOCATION, ChickensaurModel::createBodyLayer);
     }
 
     @SubscribeEvent

@@ -5,7 +5,6 @@ import net.fabricmc.fabric.api.client.rendering.v1.EntityModelLayerRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry;
 import net.hyper_pigeon.chickensaurs.client.model.ChickensaurModel;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderers;
-import net.minecraft.world.entity.animal.Chicken;
 
 public class ChickensaursClientFabric implements ClientModInitializer {
     @Override
@@ -14,5 +13,6 @@ public class ChickensaursClientFabric implements ClientModInitializer {
         EntityModelLayerRegistry.registerModelLayer(ChickensaurModel.LAYER_LOCATION, ChickensaurModel::createBodyLayer);
         EntityModelLayerRegistry.registerModelLayer(ChickensaurModel.SADDLE_LAYER_LOCATION, ChickensaurModel::createBodyLayer);
         EntityModelLayerRegistry.registerModelLayer(ChickensaurModel.BRUSHED_LAYER_LOCATION, ChickensaurModel::createBodyLayer);
+        EntityModelLayerRegistry.registerModelLayer(ChickensaurModel.BAND_LAYER_LOCATION, ChickensaurModel::createBodyLayer);
     }
 }

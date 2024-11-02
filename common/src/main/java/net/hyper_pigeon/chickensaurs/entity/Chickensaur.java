@@ -40,6 +40,8 @@ import net.minecraft.world.entity.animal.Chicken;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.monster.piglin.Piglin;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.DyeColor;
+import net.minecraft.world.item.DyeItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.*;
@@ -100,6 +102,8 @@ public class Chickensaur extends TamableAnimal implements SmartBrainOwner<Chicke
     private static final EntityDataAccessor<Integer> BRUSH_AMOUNT = SynchedEntityData.defineId(Chickensaur.class, EntityDataSerializers.INT);
     private static final EntityDataAccessor<Integer> REGEN_SCALES_TICKS = SynchedEntityData.defineId(Chickensaur.class,EntityDataSerializers.INT);
 
+    private static final EntityDataAccessor<Integer> DATA_COLLAR_COLOR = SynchedEntityData.defineId(Chickensaur.class,EntityDataSerializers.INT);
+
 
     public final AnimationState walkAnimationState = new AnimationState();
     public final AnimationState intimidateAnimationState = new AnimationState();
@@ -122,6 +126,7 @@ public class Chickensaur extends TamableAnimal implements SmartBrainOwner<Chicke
         pBuilder.define(SADDLED, false);
         pBuilder.define(BRUSH_AMOUNT,MAX_BRUSH_AMOUNT);
         pBuilder.define(REGEN_SCALES_TICKS, 0);
+        pBuilder.define(DATA_COLLAR_COLOR, DyeColor.WHITE.getId());
     }
 
     protected PathNavigation createNavigation(Level pLevel) {
@@ -315,7 +320,15 @@ public class Chickensaur extends TamableAnimal implements SmartBrainOwner<Chicke
             }
         }
         else if(isChickensaurOwner(pPlayer)) {
-            if (this.isSaddled() && !this.isVehicle() && !pPlayer.isSecondaryUseActive()) {
+            if (itemstack.getItem() instanceof DyeItem dyeItem) {
+                DyeColor dyecolor = dyeItem.getDyeColor();
+                if (dyecolor != this.getCollarColor()) {
+                    this.setCollarColor(dyecolor);
+                    itemstack.consume(1, pPlayer);
+                    return InteractionResult.SUCCESS;
+                }
+            }
+            else if (this.isSaddled() && !this.isVehicle() && !pPlayer.isSecondaryUseActive()) {
                 if (!this.level().isClientSide) {
                     pPlayer.startRiding(this);
                 }
@@ -335,6 +348,14 @@ public class Chickensaur extends TamableAnimal implements SmartBrainOwner<Chicke
 
         /*we'll probably have to add a clause here that prevents the player from brushing the chickensaur if its aggressive (though it might be
         funny if we don't)*/
+    }
+
+    public DyeColor getCollarColor() {
+        return DyeColor.byId((Integer)this.entityData.get(DATA_COLLAR_COLOR));
+    }
+
+    private void setCollarColor(DyeColor pCollarColor) {
+        this.entityData.set(DATA_COLLAR_COLOR, pCollarColor.getId());
     }
 
 
@@ -399,7 +420,7 @@ public class Chickensaur extends TamableAnimal implements SmartBrainOwner<Chicke
     public boolean hasNumbersAdvantaqe(LivingEntity potentialPrey) {
         double hunterFollowRange = this.getAttributeValue(Attributes.FOLLOW_RANGE);
         int numHunterAllies =  EntityRetrievalUtil.getEntities(this, hunterFollowRange, 10.0, hunterFollowRange, LivingEntity.class, (entity) -> entity.getType().equals(EntityRegistry.CHICKENSAUR.get())
-                && ((Chickensaur)entity).isTame()).size();
+                && ((Chickensaur)entity).hasOwner()).size();
         double preyFollowRange = this.getAttributeValue(Attributes.FOLLOW_RANGE);
         int numPreyAllies = EntityRetrievalUtil.getEntities(this, hunterFollowRange, 10.0, preyFollowRange, LivingEntity.class, (entity) -> entity.getType().equals(potentialPrey.getType())).size();
 
@@ -679,6 +700,7 @@ public class Chickensaur extends TamableAnimal implements SmartBrainOwner<Chicke
         pCompound.putBoolean("saddled",isSaddled());
         pCompound.putInt("brushAmount",getBrushAmount());
         pCompound.putInt("regenScaleTicks", getRegenScaleTicks());
+        pCompound.putByte("collarColor", (byte)this.getCollarColor().getId());
     }
 
     public void readAdditionalSaveData(CompoundTag pCompound) {
@@ -688,6 +710,9 @@ public class Chickensaur extends TamableAnimal implements SmartBrainOwner<Chicke
         setSaddled(pCompound.getBoolean("saddled"));
         setBrushAmount(pCompound.getInt("brushAmount"));
         setRegenScalesTicks(pCompound.getInt("regenScaleTicks"));
+        if (pCompound.contains("collarColor", 99)) {
+            this.setCollarColor(DyeColor.byId(pCompound.getInt("collarColor")));
+        }
     }
 
     public SpawnGroupData finalizeSpawn(ServerLevelAccessor level, DifficultyInstance difficulty, MobSpawnType spawnType, @Nullable SpawnGroupData spawnGroupData) {

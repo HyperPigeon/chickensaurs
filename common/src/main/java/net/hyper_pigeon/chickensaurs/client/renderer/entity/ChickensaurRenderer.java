@@ -2,9 +2,8 @@ package net.hyper_pigeon.chickensaurs.client.renderer.entity;
 
 import net.hyper_pigeon.chickensaurs.Constants;
 import net.hyper_pigeon.chickensaurs.client.model.ChickensaurModel;
+import net.hyper_pigeon.chickensaurs.client.renderer.entity.layers.ChickensaurBandLayer;
 import net.hyper_pigeon.chickensaurs.entity.Chickensaur;
-import net.minecraft.client.model.PigModel;
-import net.minecraft.client.model.geom.ModelLayers;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.MobRenderer;
 import net.minecraft.client.renderer.entity.layers.SaddleLayer;
@@ -16,6 +15,7 @@ public class ChickensaurRenderer extends MobRenderer<Chickensaur, ChickensaurMod
     private static final ResourceLocation SADDLE = ResourceLocation.fromNamespaceAndPath(Constants.MOD_ID,"textures/entity/chickensaur/chickensaur_saddle.png");
     private static final ResourceLocation BRUSHED = ResourceLocation.fromNamespaceAndPath(Constants.MOD_ID, "textures/entity/chickensaur/chickensaur_brushed.png");
 
+
     public ChickensaurRenderer(EntityRendererProvider.Context pContext) {
         super(pContext, new ChickensaurModel(pContext.bakeLayer(ChickensaurModel.LAYER_LOCATION)), 0.5f);
         this.addLayer(
@@ -23,6 +23,7 @@ public class ChickensaurRenderer extends MobRenderer<Chickensaur, ChickensaurMod
                         this, new ChickensaurModel(pContext.bakeLayer(ChickensaurModel.SADDLE_LAYER_LOCATION)), SADDLE
                 )
         );
+        this.addLayer(new ChickensaurBandLayer(this));
     }
 
     @Override
