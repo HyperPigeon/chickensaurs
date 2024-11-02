@@ -7,7 +7,6 @@ import net.minecraft.world.entity.monster.AbstractSkeleton;
 import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.level.Level;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Overwrite;
 
 @Mixin(value = AbstractSkeleton.class, priority = 1)
 public abstract class AbstractSkeletonMixin extends Monster {
