@@ -108,6 +108,7 @@ public class ChickensaurModel extends HierarchicalModel<Chickensaur> {
         this.root().getAllParts().forEach(ModelPart::resetPose);
         this.setHeadAngles(netHeadYaw,headPitch);
         this.setWingAngles(entity,ageInTicks);
+        this.setBeakAngles(entity);
         this.animate(entity.intimidateAnimationState, ChickensaurAnimation.CHICKENSAUR_INTIMIDATE, ageInTicks);
         this.animate(entity.biteAnimationState, ChickensaurAnimation.CHICKENSAUR_BITE,ageInTicks);
         this.animateWalk(ChickensaurAnimation.CHICKENSAUR_WALK, limbSwing, limbSwingAmount, 2F, 2F);
@@ -127,6 +128,12 @@ public class ChickensaurModel extends HierarchicalModel<Chickensaur> {
 
         this.head.yRot = headYaw * 0.017453292F;
         this.head.xRot = headPitch * 0.017453292F;
+    }
+
+    private void setBeakAngles(Chickensaur chickensaur) {
+        if(chickensaur.isPickingUpItem()) {
+            this.beakd.xRot = (float) Mth.lerp(0.10F,this.beakd.xRot,0.523599);
+        }
     }
 
 
