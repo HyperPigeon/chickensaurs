@@ -36,7 +36,7 @@ public class EatFoodInMainHand<E extends PathfinderMob> extends ExtendedBehaviou
     protected void stop(ServerLevel level, E entity, long gameTime) {
         if(hasFood((Chickensaur) entity)) {
             this.eat((Chickensaur) entity,level,entity.getMainHandItem());
-            entity.heal(5.0F);
+            entity.heal(10.0F);
         }
     }
 
