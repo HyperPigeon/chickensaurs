@@ -306,8 +306,9 @@ public class Chickensaur extends TamableAnimal implements SmartBrainOwner<Chicke
 
                 return InteractionResult.sidedSuccess(this.level().isClientSide);
             }
-        else if(hasOwner()) {
-            if (this.isSaddled() && !this.isVehicle() && !pPlayer.isSecondaryUseActive() && isChickensaurOwner(pPlayer)) {
+        }
+        else if(isChickensaurOwner(pPlayer)) {
+            if (this.isSaddled() && !this.isVehicle() && !pPlayer.isSecondaryUseActive()) {
                 if (!this.level().isClientSide) {
                     pPlayer.startRiding(this);
                 }
@@ -323,10 +324,7 @@ public class Chickensaur extends TamableAnimal implements SmartBrainOwner<Chicke
             }
         }
 
-
-        }
-
-        return super.mobInteract(pPlayer,pHand);
+        return InteractionResult.FAIL;
 
         /*we'll probably have to add a clause here that prevents the player from brushing the chickensaur if its aggressive (though it might be
         funny if we don't)*/
@@ -561,7 +559,7 @@ public class Chickensaur extends TamableAnimal implements SmartBrainOwner<Chicke
                         new TargetOrRetaliate<Chickensaur>().alertAlliesWhen((owner, attacker) ->  {
                             return attacker != null && owner.canAttackTarget((LivingEntity) attacker);
                         }).attackablePredicate(this::canAttackTarget),
-                        new IntimidateLivingEntity<Chickensaur>().runFor((entity) -> 200).startCondition((entity) -> !entity.hasOwner()),
+                        new IntimidateLivingEntity<Chickensaur>().runFor((entity) -> 200).startCondition((entity) -> !entity.hasOwner() && !entity.isBaby()),
                         new MoveToNearestVisibleWantedItem<Chickensaur>().cooldownFor((entity) -> 100),
                         new BreedWithPartner<Chickensaur>(),
                         new OneRandomBehaviour(
