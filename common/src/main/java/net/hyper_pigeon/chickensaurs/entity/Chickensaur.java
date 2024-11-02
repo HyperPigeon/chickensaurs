@@ -34,6 +34,7 @@ import net.minecraft.world.entity.ai.memory.MemoryModuleType;
 import net.minecraft.world.entity.ai.navigation.GroundPathNavigation;
 import net.minecraft.world.entity.ai.navigation.PathNavigation;
 import net.minecraft.world.entity.ai.targeting.TargetingConditions;
+import net.minecraft.world.entity.animal.Animal;
 import net.minecraft.world.entity.animal.Chicken;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.monster.piglin.Piglin;
@@ -54,6 +55,7 @@ import net.tslat.smartbrainlib.api.core.behaviour.FirstApplicableBehaviour;
 import net.tslat.smartbrainlib.api.core.behaviour.OneRandomBehaviour;
 import net.tslat.smartbrainlib.api.core.behaviour.custom.attack.AnimatableMeleeAttack;
 import net.tslat.smartbrainlib.api.core.behaviour.custom.look.LookAtTarget;
+import net.tslat.smartbrainlib.api.core.behaviour.custom.misc.BreedWithPartner;
 import net.tslat.smartbrainlib.api.core.behaviour.custom.misc.Idle;
 import net.tslat.smartbrainlib.api.core.behaviour.custom.move.*;
 import net.tslat.smartbrainlib.api.core.behaviour.custom.path.SetRandomWalkTarget;
@@ -291,33 +293,41 @@ public class Chickensaur extends TamableAnimal implements SmartBrainOwner<Chicke
             itemstack.hurtAndBreak(24, pPlayer, getSlotForHand(pHand));
             return InteractionResult.sidedSuccess(this.level().isClientSide);
         }
-        else if(itemstack.is(Items.BONE) && canTame()) {
-            setOwnerUUID(pPlayer.getUUID());
+        else if(canTame()) {
+            if(isFood(itemstack)) {
+                setOwnerUUID(pPlayer.getUUID());
 
-            for(int i = 0; i < 7; ++i) {
-                double d0 = this.random.nextGaussian() * 0.02;
-                double d1 = this.random.nextGaussian() * 0.02;
-                double d2 = this.random.nextGaussian() * 0.02;
-                this.level().addParticle(ParticleTypes.HEART, this.getRandomX(1.0), this.getRandomY() + 0.5, this.getRandomZ(1.0), d0, d1, d2);
+                for(int i = 0; i < 7; ++i) {
+                    double d0 = this.random.nextGaussian() * 0.02;
+                    double d1 = this.random.nextGaussian() * 0.02;
+                    double d2 = this.random.nextGaussian() * 0.02;
+                    this.level().addParticle(ParticleTypes.HEART, this.getRandomX(1.0), this.getRandomY() + 0.5, this.getRandomZ(1.0), d0, d1, d2);
+                }
+
+                return InteractionResult.sidedSuccess(this.level().isClientSide);
             }
+        else if(hasOwner()) {
+            if (this.isSaddled() && !this.isVehicle() && !pPlayer.isSecondaryUseActive() && isChickensaurOwner(pPlayer)) {
+                if (!this.level().isClientSide) {
+                    pPlayer.startRiding(this);
+                }
 
-            return InteractionResult.sidedSuccess(this.level().isClientSide);
-        }
-        else if (this.isSaddled() && !this.isVehicle() && !pPlayer.isSecondaryUseActive() && isChickensaurOwner(pPlayer)) {
-            if (!this.level().isClientSide) {
-                pPlayer.startRiding(this);
+                return InteractionResult.sidedSuccess(this.level().isClientSide);
             }
-
-            return InteractionResult.sidedSuccess(this.level().isClientSide);
-        }
-        else {
-            InteractionResult interactionresult = super.mobInteract(pPlayer, pHand);
-            if (!interactionresult.consumesAction()) {
-                return itemstack.is(Items.SADDLE) ? itemstack.interactLivingEntity(pPlayer, this, pHand) : InteractionResult.PASS;
-            } else {
+            else {
+                InteractionResult interactionresult = super.mobInteract(pPlayer, pHand);
+                if (!interactionresult.consumesAction()) {
+                    return itemstack.is(Items.SADDLE) ? itemstack.interactLivingEntity(pPlayer, this, pHand) : InteractionResult.PASS;
+                }
                 return interactionresult;
             }
         }
+
+
+        }
+
+        return super.mobInteract(pPlayer,pHand);
+
         /*we'll probably have to add a clause here that prevents the player from brushing the chickensaur if its aggressive (though it might be
         funny if we don't)*/
     }
@@ -383,7 +393,8 @@ public class Chickensaur extends TamableAnimal implements SmartBrainOwner<Chicke
 
     public boolean hasNumbersAdvantaqe(LivingEntity potentialPrey) {
         double hunterFollowRange = this.getAttributeValue(Attributes.FOLLOW_RANGE);
-        int numHunterAllies =  EntityRetrievalUtil.getEntities(this, hunterFollowRange, 10.0, hunterFollowRange, LivingEntity.class, (entity) -> entity.getType().equals(EntityRegistry.CHICKENSAUR.get())).size();
+        int numHunterAllies =  EntityRetrievalUtil.getEntities(this, hunterFollowRange, 10.0, hunterFollowRange, LivingEntity.class, (entity) -> entity.getType().equals(EntityRegistry.CHICKENSAUR.get())
+                && ((Chickensaur)entity).isTame()).size();
         double preyFollowRange = this.getAttributeValue(Attributes.FOLLOW_RANGE);
         int numPreyAllies = EntityRetrievalUtil.getEntities(this, hunterFollowRange, 10.0, preyFollowRange, LivingEntity.class, (entity) -> entity.getType().equals(potentialPrey.getType())).size();
 
@@ -432,10 +443,11 @@ public class Chickensaur extends TamableAnimal implements SmartBrainOwner<Chicke
             if(target instanceof ServerPlayer player && (player.isCreative() || isChickensaurOwner(player))) {
                 return false;
             }
-            else if(type.is(Constants.HUNT)) {
+
+            if(type.is(Constants.HUNT)) {
                 return true;
             }
-            else if(hasOwner()) {
+            if(hasOwner()) {
                 LivingEntity owner = getOwner();
                 if(owner != null && owner.isAlive()) {
                     LivingEntity ownerHurtByTarget = owner.getLastHurtByMob();
@@ -489,6 +501,21 @@ public class Chickensaur extends TamableAnimal implements SmartBrainOwner<Chicke
         }
     }
 
+    public void spawnChildFromBreeding(ServerLevel pLevel, Animal pMate) {
+        Chickensaur babyChickensaur = (Chickensaur) this.getBreedOffspring(pLevel, pMate);
+        if (babyChickensaur != null) {
+            babyChickensaur.setBaby(true);
+            babyChickensaur.moveTo(this.getX(), this.getY(), this.getZ(), 0.0F, 0.0F);
+            if(this.hasOwner()) {
+                UUID ownerUUID = this.getOwnerUUID();
+                babyChickensaur.setOwnerUUID(ownerUUID);
+            }
+
+            this.finalizeSpawnChildFromBreeding(pLevel, pMate, babyChickensaur);
+            pLevel.addFreshEntityWithPassengers(babyChickensaur);
+        }
+    }
+
 
     @Override
     protected Brain.Provider<?> brainProvider() {
@@ -534,8 +561,9 @@ public class Chickensaur extends TamableAnimal implements SmartBrainOwner<Chicke
                         new TargetOrRetaliate<Chickensaur>().alertAlliesWhen((owner, attacker) ->  {
                             return attacker != null && owner.canAttackTarget((LivingEntity) attacker);
                         }).attackablePredicate(this::canAttackTarget),
-                        new IntimidateLivingEntity<Chickensaur>().runFor((entity) -> 200),
+                        new IntimidateLivingEntity<Chickensaur>().runFor((entity) -> 200).startCondition((entity) -> !entity.hasOwner()),
                         new MoveToNearestVisibleWantedItem<Chickensaur>().cooldownFor((entity) -> 100),
+                        new BreedWithPartner<Chickensaur>(),
                         new OneRandomBehaviour(
                                 new SetRandomLookTarget<Chickensaur>(),
                                 new SetRandomWalkTarget<Chickensaur>().setRadius(3).speedModifier(0.75F).cooldownFor((entity) -> 150),
