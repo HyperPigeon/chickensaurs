@@ -19,6 +19,7 @@ public class ChickensaurModel extends HierarchicalModel<Chickensaur> {
     public static final ModelLayerLocation SADDLE_LAYER_LOCATION = new ModelLayerLocation(ResourceLocation.fromNamespaceAndPath(Constants.MOD_ID, "chickensaur_saddle"), "saddle");
     public static final ModelLayerLocation BRUSHED_LAYER_LOCATION = new ModelLayerLocation(ResourceLocation.fromNamespaceAndPath(Constants.MOD_ID, "chickensaur_brushed"), "main");
 
+    public static final ModelLayerLocation BAND_LAYER_LOCATION = new ModelLayerLocation(ResourceLocation.fromNamespaceAndPath(Constants.MOD_ID, "chickensaur_band"), "main");
 
     private final ModelPart root;
     private final ModelPart upper;
