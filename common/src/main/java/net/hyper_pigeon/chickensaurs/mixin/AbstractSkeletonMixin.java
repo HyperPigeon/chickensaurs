@@ -17,7 +17,7 @@ public abstract class AbstractSkeletonMixin extends Monster {
 
     /**
      * @author CyborgPigeon
-     * @reason The hurt() method was overrided in AbstractSkeletonMixin to allow Chickensaurs to do extra damage to skeletons and provide them with an insta-kill attack on AbstractSkeletons
+     * The hurt() method was overrided in AbstractSkeletonMixin to allow Chickensaurs to do extra damage to skeletons and provide them with an insta-kill attack on AbstractSkeletons
      * with 1/3 health or less.
      */
     @Override
@@ -26,7 +26,7 @@ public abstract class AbstractSkeletonMixin extends Monster {
             super.hurt(pSource, 1000.0F);
             return true;
         } else {
-            return this.isInvulnerableTo(pSource) ? false : super.hurt(pSource, pAmount);
+            return !this.isInvulnerableTo(pSource) && super.hurt(pSource, pAmount);
         }
 
     }
