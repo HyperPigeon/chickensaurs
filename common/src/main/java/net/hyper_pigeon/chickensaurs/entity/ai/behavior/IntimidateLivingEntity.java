@@ -5,6 +5,7 @@ import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.hyper_pigeon.chickensaurs.Constants;
 import net.hyper_pigeon.chickensaurs.entity.Chickensaur;
 import net.hyper_pigeon.chickensaurs.entity.ai.memory_types.ChickensaurMemoryTypes;
+import net.hyper_pigeon.chickensaurs.register.SoundRegistry;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.EntityType;
@@ -61,6 +62,7 @@ public class IntimidateLivingEntity<E extends PathfinderMob> extends ExtendedBeh
             chickensaur.setIntimidating(true);
             BrainUtils.setMemory(chickensaur, MemoryModuleType.LOOK_TARGET, new EntityTracker(intimidateTarget, true));
             BrainUtils.setMemory(chickensaur, ChickensaurMemoryTypes.INTIMIDATE_TARGET.get(), intimidateTarget);
+            chickensaur.playSound(SoundRegistry.THREATEN.get(), 1.0F,1.0F);
         }
     }
 

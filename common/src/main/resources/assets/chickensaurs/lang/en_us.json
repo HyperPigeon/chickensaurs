@@ -12,5 +12,16 @@
   "tag.chickensaurs.entity_type.chickensur_hunt": "Chickensaurs hunt",
   "tag.chickensaurs.entity_type.chickensur_intimidate": "Chickensaurs intimidate",
   "tag.chickensaurs.items.chickensaur_food": "Chickensaur Food",
-  "tag.chickensaurs.worldgen.biome.chickensaur_spawn_biomes": "Chickensaurs spawn in"
+  "tag.chickensaurs.worldgen.biome.chickensaur_spawn_biomes": "Chickensaurs spawn in",
+
+
+  "sounds.chickensaurs.chickensaur_brush": "Brushing Chickensaur",
+  "sounds.chickensaurs.chickensaur_hurt_one": "Chickensaur hurt",
+  "sounds.chickensaurs.chickensaur_hurt_two": "Chickensaur dies",
+  "sounds.chickensaurs.chickensaur_idle_one": "Chickensaur clucks",
+  "sounds.chickensaurs.chickensaur_idle_two": "Chickensaur clucks",
+  "sounds.chickensaurs.chickensaur_step_one": "Chickensaur walks",
+  "sounds.chickensaurs.chickensaur_step_two": "Chickensaur walks",
+  "sounds.chickensaurs.chickensaur_threaten": "Chickensaur threatens intruder"
+
 }

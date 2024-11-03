@@ -1,0 +1,50 @@
+{
+  "chickensaur_brush": {
+    "subtitle": "sounds.chickensaurs.chickensaur_brush",
+    "sounds": [
+      "chickensaurs:chickensaur_brush"
+    ]
+  },
+  "chickensaur_hurt_one": {
+    "subtitle": "sounds.chickensaurs.chickensaur_hurt_one",
+    "sounds": [
+      "chickensaurs:chickensaur_hurt_one"
+    ]
+  },
+  "chickensaur_hurt_two": {
+    "subtitle": "sounds.chickensaurs.chickensaur_hurt_two",
+    "sounds": [
+      "chickensaurs:chickensaur_hurt_two"
+    ]
+  },
+  "chickensaur_idle_one": {
+    "subtitle": "sounds.chickensaurs.chickensaur_idle_one",
+    "sounds": [
+      "chickensaurs:chickensaur_idle_one"
+    ]
+  },
+  "chickensaur_idle_two": {
+    "subtitle": "sounds.chickensaurs.chickensaur_idle_two",
+    "sounds": [
+      "chickensaurs:chickensaur_idle_two"
+    ]
+  },
+  "chickensaur_step_one": {
+    "subtitle": "sounds.chickensaurs.chickensaur_step_one",
+    "sounds": [
+      "chickensaurs:chickensaur_step_one"
+    ]
+  },
+  "chickensaur_step_two": {
+    "subtitle": "sounds.chickensaurs.chickensaur_step_two",
+    "sounds": [
+      "chickensaurs:chickensaur_step_two"
+    ]
+  },
+  "chickensaur_threaten": {
+    "subtitle": "sounds.chickensaurs.chickensaur_threaten",
+    "sounds": [
+      "chickensaurs:chickensaur_threaten"
+    ]
+  }
+}
