@@ -513,7 +513,7 @@ public class Chickensaur extends TamableAnimal implements SmartBrainOwner<Chicke
                     Entity revengeTarget = damageSource.getEntity();
                     return revengeTarget != null && revengeTarget.is(target);
                 }
-                else if(type.is(Constants.INTIMIDATE) && canAttackTooClosePossiblePlayer(target) && this.distanceToSqr(target) < 4) {
+                else if(!isBaby() && type.is(Constants.INTIMIDATE) && canAttackTooClosePossiblePlayer(target) && this.distanceToSqr(target) < 4) {
                     return true;
                 }
                 else if(type.is(Constants.GROUP_HUNT)) {
