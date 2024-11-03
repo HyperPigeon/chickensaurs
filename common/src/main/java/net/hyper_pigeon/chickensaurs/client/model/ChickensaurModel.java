@@ -111,6 +111,7 @@ public class ChickensaurModel extends HierarchicalModel<Chickensaur> {
         this.setBeakAngles(entity);
         this.animate(entity.intimidateAnimationState, ChickensaurAnimation.CHICKENSAUR_INTIMIDATE, ageInTicks);
         this.animate(entity.biteAnimationState, ChickensaurAnimation.CHICKENSAUR_BITE,ageInTicks);
+        this.animate(entity.eatAnimationState,ChickensaurAnimation.CHICKENSAUR_EAT,ageInTicks);
         this.animateWalk(ChickensaurAnimation.CHICKENSAUR_WALK, limbSwing, limbSwingAmount, 2F, 2F);
     }
 

@@ -109,6 +109,7 @@ public class Chickensaur extends TamableAnimal implements SmartBrainOwner<Chicke
     public final AnimationState walkAnimationState = new AnimationState();
     public final AnimationState intimidateAnimationState = new AnimationState();
     public final AnimationState biteAnimationState = new AnimationState();
+    public final AnimationState eatAnimationState = new AnimationState();;
 
 
     public Chickensaur(EntityType<? extends TamableAnimal> pEntityType, Level pLevel) {
@@ -331,10 +332,11 @@ public class Chickensaur extends TamableAnimal implements SmartBrainOwner<Chicke
                     return InteractionResult.SUCCESS;
                 }
             }
-            else if (isFood(itemstack) && !canBreed()) {
+            else if (isFood(itemstack) && !canBreed() && this.getHealth() < this.getMaxHealth()) {
                 level().playSound(null, this.getX(), this.getY(), this.getZ(), this.getEatingSound(itemstack), SoundSource.NEUTRAL, 1.0F, 1.0F + (level().random.nextFloat() - level().random.nextFloat()) * 0.4F);
                 this.heal(3);
                 itemstack.consume(1, pPlayer);
+                eatAnimationState.start(this.tickCount);
             }
             else if (this.isSaddled() && !this.isVehicle() && !pPlayer.isSecondaryUseActive()) {
                 if (!this.level().isClientSide) {
