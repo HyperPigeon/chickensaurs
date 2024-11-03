@@ -58,7 +58,7 @@ public class MoveToNearestVisibleWantedItem<E extends PathfinderMob> extends Ext
     @Override
     protected boolean checkExtraStartConditions(ServerLevel level, E entity) {
         ItemEntity itemEntity = BrainUtils.getMemory(entity, MemoryModuleType.NEAREST_VISIBLE_WANTED_ITEM);
-        return !hasFood(entity) && (this.targetItem == null || entity.distanceToSqr(targetItem) > entity.distanceTo(itemEntity));
+        return entity.getHealth() < entity.getMaxHealth() && !hasFood(entity) && (this.targetItem == null || entity.distanceToSqr(targetItem) > entity.distanceTo(itemEntity));
     }
 
 
