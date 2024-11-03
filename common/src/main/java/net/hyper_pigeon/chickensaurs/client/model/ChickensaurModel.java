@@ -133,7 +133,7 @@ public class ChickensaurModel extends HierarchicalModel<Chickensaur> {
 
     private void setBeakAngles(Chickensaur chickensaur) {
         if(chickensaur.isPickingUpItem()) {
-            this.beakd.xRot = (float) Mth.lerp(0.10F,this.beakd.xRot,0.523599);
+            this.beakd.xRot = 30F*0.017453292F;
         }
     }
 
@@ -155,4 +155,6 @@ public class ChickensaurModel extends HierarchicalModel<Chickensaur> {
     public ModelPart root() {
         return this.root;
     }
+
+    public ModelPart beak(){return this.beak;}
 }
