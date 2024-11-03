@@ -12,5 +12,14 @@
   "tag.chickensaurs.entity_type.chickensur_hunt": "Kurozaury polują na",
   "tag.chickensaurs.entity_type.chickensur_intimidate": "Kurozaury zastraszają",
   "tag.chickensaurs.items.chickensaur_food": "Pokarm kurozaurów",
-  "tag.chickensaurs.worldgen.biome.chickensaur_spawn_biomes": "Kurozaury spawnują się w"
+  "tag.chickensaurs.worldgen.biome.chickensaur_spawn_biomes": "Kurozaury spawnują się w",
+
+  "sounds.chickensaurs.chickensaur_brush": "Szczotkowanie kurozaura",
+  "sounds.chickensaurs.chickensaur_hurt_one": "Kurozaur cierpi",
+  "sounds.chickensaurs.chickensaur_hurt_two": "Kurozaur ginie",
+  "sounds.chickensaurs.chickensaur_idle_one": "Kurozaur gdacze",
+  "sounds.chickensaurs.chickensaur_idle_two": "Kurozaur gdacze",
+  "sounds.chickensaurs.chickensaur_step_one": "Kurozaur gdacze",
+  "sounds.chickensaurs.chickensaur_step_two": "Kroki",
+  "sounds.chickensaurs.chickensaur_threaten": "Kurozaur zastrasza"
 }
