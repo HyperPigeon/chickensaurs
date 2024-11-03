@@ -7,4 +7,4 @@
 - When approached by a player or a piglin, chickensaurs will attempt to scare them off by expelling soulfire from its comb. They will attack if the intruder gets too close.
 - Chickensaurs can be tamed, healed and bred with bones. A tamed chickensaur is given a dyeable leg band, and can be saddled! Tamed chickensaurs will also fight alongside their owner.
 
-The mod was created for [Modfest 1.21](https://modfest.net/1.21).
+The mod was created for [ModFest 1.21](https://modfest.net/1.21).
