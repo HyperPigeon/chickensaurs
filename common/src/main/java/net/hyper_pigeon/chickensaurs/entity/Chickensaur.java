@@ -7,6 +7,7 @@ import net.hyper_pigeon.chickensaurs.entity.ai.behavior.IntimidateLivingEntity;
 import net.hyper_pigeon.chickensaurs.entity.ai.behavior.MoveToNearestVisibleWantedItem;
 import net.hyper_pigeon.chickensaurs.register.EntityRegistry;
 import net.hyper_pigeon.chickensaurs.register.ItemRegistry;
+import net.hyper_pigeon.chickensaurs.register.SoundRegistry;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Vec3i;
 import net.minecraft.core.particles.ParticleTypes;
@@ -254,15 +255,20 @@ public class Chickensaur extends TamableAnimal implements SmartBrainOwner<Chicke
     }
 
     protected SoundEvent getAmbientSound() {
-        return SoundEvents.CHICKEN_AMBIENT;
+        return this.random.nextDouble() < 0.5 ? SoundRegistry.IDLE_ONE.get() : SoundRegistry.IDLE_TWO.get();
     }
 
     protected SoundEvent getHurtSound(DamageSource pDamageSource) {
-        return SoundEvents.CHICKEN_HURT;
+        return SoundRegistry.HURT_ONE.get();
     }
 
     protected SoundEvent getDeathSound() {
-        return SoundEvents.CHICKEN_DEATH;
+        return SoundRegistry.HURT_TWO.get();
+    }
+
+    protected void playStepSound(BlockPos pPos, BlockState pBlock) {
+        SoundEvent stepSound = this.random.nextDouble() < 0.5 ? SoundRegistry.STEP_ONE.get() : SoundRegistry.STEP_TWO.get();
+        this.playSound(stepSound, 0.20F, 1.0F);
     }
 
     protected Vec3i getPickupReach(){
@@ -308,6 +314,7 @@ public class Chickensaur extends TamableAnimal implements SmartBrainOwner<Chicke
         ItemStack itemstack = pPlayer.getItemInHand(pHand);
         if (itemstack.is(Items.BRUSH) && this.brushOffIronNuggets()) {
             itemstack.hurtAndBreak(24, pPlayer, getSlotForHand(pHand));
+            level().playSound(null,this.getX(), this.getY(), this.getZ(), SoundRegistry.BRUSH.get(), SoundSource.NEUTRAL, 1.0F, 1.0F + (level().random.nextFloat() - level().random.nextFloat()) * 0.4F);
             return InteractionResult.sidedSuccess(this.level().isClientSide);
         }
         else if(canTame()) {
@@ -716,6 +723,7 @@ public class Chickensaur extends TamableAnimal implements SmartBrainOwner<Chicke
     public void setSaddled(boolean is_saddled){
         this.entityData.set(SADDLED,is_saddled);
     }
+
 
     public void addAdditionalSaveData(CompoundTag pCompound) {
         super.addAdditionalSaveData(pCompound);
