@@ -20,8 +20,8 @@
   "sounds.chickensaurs.chickensaur_hurt_two": "Chickensaur dies",
   "sounds.chickensaurs.chickensaur_idle_one": "Chickensaur clucks",
   "sounds.chickensaurs.chickensaur_idle_two": "Chickensaur clucks",
-  "sounds.chickensaurs.chickensaur_step_one": "Chickensaur walks",
-  "sounds.chickensaurs.chickensaur_step_two": "Chickensaur walks",
+  "sounds.chickensaurs.chickensaur_step_one": "Footsteps",
+  "sounds.chickensaurs.chickensaur_step_two": "Footsteps",
   "sounds.chickensaurs.chickensaur_threaten": "Chickensaur threatens intruder"
 
 }
