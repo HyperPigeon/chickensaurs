@@ -106,7 +106,6 @@ public class Chickensaur extends TamableAnimal implements SmartBrainOwner<Chicke
 
     private static final EntityDataAccessor<Boolean> PICKING_UP_ITEM = SynchedEntityData.defineId(Chickensaur.class, EntityDataSerializers.BOOLEAN);
 
-
     public final AnimationState walkAnimationState = new AnimationState();
     public final AnimationState intimidateAnimationState = new AnimationState();
     public final AnimationState biteAnimationState = new AnimationState();
@@ -224,6 +223,7 @@ public class Chickensaur extends TamableAnimal implements SmartBrainOwner<Chicke
             }
         }
 
+
         if(getBrushAmount() <= 0) {
             if(getRegenScaleTicks() > REGEN_SCALE_TIME) {
                 setBrushAmount(MAX_BRUSH_AMOUNT);
@@ -330,6 +330,11 @@ public class Chickensaur extends TamableAnimal implements SmartBrainOwner<Chicke
                     itemstack.consume(1, pPlayer);
                     return InteractionResult.SUCCESS;
                 }
+            }
+            else if (isFood(itemstack) && !canBreed()) {
+                level().playSound(null, this.getX(), this.getY(), this.getZ(), this.getEatingSound(itemstack), SoundSource.NEUTRAL, 1.0F, 1.0F + (level().random.nextFloat() - level().random.nextFloat()) * 0.4F);
+                this.heal(3);
+                itemstack.consume(1, pPlayer);
             }
             else if (this.isSaddled() && !this.isVehicle() && !pPlayer.isSecondaryUseActive()) {
                 if (!this.level().isClientSide) {
@@ -484,14 +489,15 @@ public class Chickensaur extends TamableAnimal implements SmartBrainOwner<Chicke
             if(hasOwner()) {
                 LivingEntity owner = getOwner();
                 if(owner != null && owner.isAlive()) {
+                    boolean isTargetChickensaurWithSameOwner = (target instanceof Chickensaur chickensaur && chickensaur.isChickensaurOwner(owner));
                     LivingEntity ownerHurtByTarget = owner.getLastHurtByMob();
                     if(ownerHurtByTarget != null && ownerHurtByTarget.isAlive()) {
-                        return target.is(ownerHurtByTarget);
+                        return target.is(ownerHurtByTarget) && !isTargetChickensaurWithSameOwner;
                     }
 
                     LivingEntity ownerHurtTarget = owner.getLastHurtMob();
                     if(ownerHurtTarget != null && ownerHurtTarget.isAlive()) {
-                        return target.is(ownerHurtTarget);
+                        return target.is(ownerHurtTarget) && !isTargetChickensaurWithSameOwner;
                     }
                 }
             }
