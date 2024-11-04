@@ -750,7 +750,6 @@ public class Chickensaur extends TamableAnimal implements SmartBrainOwner<Chicke
         this.entityData.set(SADDLED,is_saddled);
     }
 
-    @javax.annotation.Nullable
     private Vec3 getDismountLocationInDirection(Vec3 pDirection, LivingEntity pPassenger) {
         double d0 = this.getX() + pDirection.x;
         double d1 = this.getBoundingBox().minY;
