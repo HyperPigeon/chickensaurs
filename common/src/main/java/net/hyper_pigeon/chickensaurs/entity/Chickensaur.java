@@ -1,5 +1,6 @@
 package net.hyper_pigeon.chickensaurs.entity;
 
+import com.google.common.collect.UnmodifiableIterator;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.hyper_pigeon.chickensaurs.Constants;
 import net.hyper_pigeon.chickensaurs.entity.ai.behavior.EatFoodInMainHand;
@@ -9,6 +10,7 @@ import net.hyper_pigeon.chickensaurs.register.EntityRegistry;
 import net.hyper_pigeon.chickensaurs.register.ItemRegistry;
 import net.hyper_pigeon.chickensaurs.register.SoundRegistry;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.core.Vec3i;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
@@ -23,6 +25,8 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
+import net.minecraft.util.valueproviders.ConstantFloat;
+import net.minecraft.util.valueproviders.UniformFloat;
 import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -38,10 +42,13 @@ import net.minecraft.world.entity.ai.targeting.TargetingConditions;
 import net.minecraft.world.entity.animal.Animal;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.vehicle.DismountHelper;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.DyeItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.item.enchantment.effects.PlaySoundEffect;
+import net.minecraft.world.item.enchantment.effects.SpawnParticlesEffect;
 import net.minecraft.world.level.*;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.gameevent.GameEvent;
@@ -242,6 +249,25 @@ public class Chickensaur extends TamableAnimal implements SmartBrainOwner<Chicke
             if (this.random.nextInt(900) == 0 && this.deathTime == 0) {
                 this.heal(1.0F);
             }
+
+            BlockPos blockPos = this.getBlockPosBelowThatAffectsMyMovement();
+            BlockState blockState = this.level().getBlockState(blockPos);
+
+            if(this.random.nextDouble() < 0.05 && blockState.is(BlockTags.SOUL_SPEED_BLOCKS)) {
+                SpawnParticlesEffect spawnParticlesEffect = new SpawnParticlesEffect(
+                        ParticleTypes.SOUL,
+                        SpawnParticlesEffect.inBoundingBox(),
+                        SpawnParticlesEffect.offsetFromEntityPosition(0.1F),
+                        SpawnParticlesEffect.movementScaled(-0.2F),
+                        SpawnParticlesEffect.fixedVelocity(ConstantFloat.of(0.1F)),
+                        ConstantFloat.of(1.0F)
+                );
+
+                PlaySoundEffect playSoundEffect = new PlaySoundEffect(SoundEvents.SOUL_ESCAPE, ConstantFloat.of(0.4F), UniformFloat.of(0.6F, 1.0F));
+
+                spawnParticlesEffect.apply((ServerLevel) level(),1,null,this,this.position());
+                playSoundEffect.apply((ServerLevel) level(),1,null,this,this.position());
+            }
         }
 
     }
@@ -422,7 +448,7 @@ public class Chickensaur extends TamableAnimal implements SmartBrainOwner<Chicke
         BlockPos blockPos = this.getBlockPosBelowThatAffectsMyMovement();
         BlockState blockState = this.level().getBlockState(blockPos);
         if(blockState.is(BlockTags.SOUL_SPEED_BLOCKS)){
-            return 1.2F;
+            return 1.3F;
         }
         return super.getBlockSpeedFactor();
     }
@@ -694,7 +720,7 @@ public class Chickensaur extends TamableAnimal implements SmartBrainOwner<Chicke
             f1 *= 0.25F;
         }
 
-        return new Vec3((double)f, 0.0, (double)f1);
+        return new Vec3(f, 0.0, f1);
     }
 
     protected float getRiddenSpeed(Player pPlayer) {
@@ -724,6 +750,55 @@ public class Chickensaur extends TamableAnimal implements SmartBrainOwner<Chicke
         this.entityData.set(SADDLED,is_saddled);
     }
 
+    @javax.annotation.Nullable
+    private Vec3 getDismountLocationInDirection(Vec3 pDirection, LivingEntity pPassenger) {
+        double d0 = this.getX() + pDirection.x;
+        double d1 = this.getBoundingBox().minY;
+        double d2 = this.getZ() + pDirection.z;
+        BlockPos.MutableBlockPos blockpos$mutableblockpos = new BlockPos.MutableBlockPos();
+        UnmodifiableIterator var10 = pPassenger.getDismountPoses().iterator();
+
+        while(var10.hasNext()) {
+            Pose pose = (Pose)var10.next();
+            blockpos$mutableblockpos.set(d0, d1, d2);
+            double d3 = this.getBoundingBox().maxY + 0.75;
+
+            while(true) {
+                double d4 = this.level().getBlockFloorHeight(blockpos$mutableblockpos);
+                if ((double)blockpos$mutableblockpos.getY() + d4 > d3) {
+                    break;
+                }
+
+                if (DismountHelper.isBlockFloorValid(d4)) {
+                    AABB aabb = pPassenger.getLocalBoundsForPose(pose);
+                    Vec3 vec3 = new Vec3(d0, (double)blockpos$mutableblockpos.getY() + d4, d2);
+                    if (DismountHelper.canDismountTo(this.level(), pPassenger, aabb.move(vec3))) {
+                        pPassenger.setPose(pose);
+                        return vec3;
+                    }
+                }
+
+                blockpos$mutableblockpos.move(Direction.UP);
+                if ((double)blockpos$mutableblockpos.getY() < d3) {
+                    break;
+                }
+            }
+        }
+
+        return null;
+    }
+
+    public Vec3 getDismountLocationForPassenger(LivingEntity pLivingEntity) {
+        Vec3 vec3 = getCollisionHorizontalEscapeVector((double)this.getBbWidth(), (double)pLivingEntity.getBbWidth(), this.getYRot() + (pLivingEntity.getMainArm() == HumanoidArm.RIGHT ? 90.0F : -90.0F));
+        Vec3 vec31 = this.getDismountLocationInDirection(vec3, pLivingEntity);
+        if (vec31 != null) {
+            return vec31;
+        } else {
+            Vec3 vec32 = getCollisionHorizontalEscapeVector((double)this.getBbWidth(), (double)pLivingEntity.getBbWidth(), this.getYRot() + (pLivingEntity.getMainArm() == HumanoidArm.LEFT ? 90.0F : -90.0F));
+            Vec3 vec33 = this.getDismountLocationInDirection(vec32, pLivingEntity);
+            return vec33 != null ? vec33 : this.position();
+        }
+    }
 
     public void addAdditionalSaveData(CompoundTag pCompound) {
         super.addAdditionalSaveData(pCompound);

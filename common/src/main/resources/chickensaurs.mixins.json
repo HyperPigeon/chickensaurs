@@ -6,8 +6,9 @@
   "compatibilityLevel": "JAVA_18",
   "mixins": [
     "AbstractSkeletonMixin",
-    "SkeletonMixin",
     "BaseFireBlockMixin",
+    "ServerGamePacketListenerImplMixin",
+    "SkeletonMixin",
     "WitherSkeletonMixin"
   ],
   "server": [],
