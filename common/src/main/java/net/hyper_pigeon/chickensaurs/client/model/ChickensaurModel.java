@@ -66,7 +66,7 @@ public class ChickensaurModel extends HierarchicalModel<Chickensaur> {
 
         PartDefinition necku = neck.addOrReplaceChild("necku", CubeListBuilder.create(), PartPose.offset(0.0F, -1.5F, 0.0F));
 
-        PartDefinition cube_r1 = necku.addOrReplaceChild("cube_r1", CubeListBuilder.create().texOffs(21, 11).addBox(-2.0F, -3.0F, -1.0F, 4.0F, 6.0F, 3.0F, new CubeDeformation(0.0F)), PartPose.offsetAndRotation(0.0F, -2.5F, 0.0F, -0.3054F, 0.0F, 0.0F));
+        PartDefinition cube_r1 = necku.addOrReplaceChild("cube_r1", CubeListBuilder.create().texOffs(21, 11).addBox(-2.0F, -2.0F, -1.0F, 4.0F, 5.0F, 3.0F, new CubeDeformation(0.0F)), PartPose.offsetAndRotation(0.0F, -2.5F, 0.0F, -0.3054F, 0.0F, 0.0F));
 
         PartDefinition neckd = neck.addOrReplaceChild("neckd", CubeListBuilder.create(), PartPose.offset(0.0F, 0.0F, 0.0F));
 
