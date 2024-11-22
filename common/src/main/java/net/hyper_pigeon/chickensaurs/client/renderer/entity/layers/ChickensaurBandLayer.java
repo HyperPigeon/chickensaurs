@@ -23,7 +23,7 @@ public class ChickensaurBandLayer extends RenderLayer<Chickensaur, ChickensaurMo
     @Override
     public void render(PoseStack poseStack, MultiBufferSource multiBufferSource, int i, Chickensaur chickensaur, float v, float v1, float v2, float v3, float v4, float v5) {
         if (chickensaur.hasOwner() && !chickensaur.isInvisible()) {
-            int color = chickensaur.getCollarColor().getTextureDiffuseColor();
+            int color = chickensaur.getCollarColor();
             VertexConsumer vertexconsumer = multiBufferSource.getBuffer(RenderType.entityCutoutNoCull(BAND_LOCATION));
             ((ChickensaurModel)this.getParentModel()).renderToBuffer(poseStack, vertexconsumer, i, OverlayTexture.NO_OVERLAY, color);
         }

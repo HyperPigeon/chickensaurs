@@ -8,6 +8,21 @@ repositories {
         name = "SmartBrainLib (SBL) Maven Repo"
         url = "https://dl.cloudsmith.io/public/tslat/sbl/maven/"
     }
+    exclusiveContent {
+        forRepository {
+            maven {
+                name = "Modrinth"
+                url = "https://api.modrinth.com/maven"
+            }
+        }
+        filter {
+            includeGroup "maven.modrinth"
+        }
+    }
+    maven {
+        name = "Kotlin for Forge"
+        setUrl("https://thedarkcolour.github.io/KotlinForForge/")
+    }
 }
 
 neoForge {
@@ -43,8 +58,11 @@ neoForge {
     }
 }
 
+
 dependencies {
     implementation "net.tslat.smartbrainlib:SmartBrainLib-neoforge-1.21.1:${project.sbl_version}"
+    implementation "maven.modrinth:past-el-palettes:${project.pastel_palletes_version}"
+    implementation("thedarkcolour:kotlinforforge-neoforge:$kff_version")
 }
 
 sourceSets.main.resources { srcDir 'src/generated/resources' }

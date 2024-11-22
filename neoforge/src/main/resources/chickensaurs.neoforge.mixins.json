@@ -3,9 +3,12 @@
   "minVersion": "0.8",
   "package": "net.hyper_pigeon.chickensaurs.mixin",
   "compatibilityLevel": "JAVA_21",
-  "mixins": [],
+  "mixins": [
+    "compat.past_el_palettes.PastelPalettesCompat"
+  ],
   "server": [],
   "injectors": {
     "defaultRequire": 1
-  }
+  },
+  "plugin": "net.hyper_pigeon.chickensaurs.compat.ChickensaurMixinPlugin"
 }

@@ -360,8 +360,8 @@ public class Chickensaur extends TamableAnimal implements SmartBrainOwner<Chicke
         else if(isChickensaurOwner(pPlayer)) {
             if (itemstack.getItem() instanceof DyeItem dyeItem) {
                 DyeColor dyecolor = dyeItem.getDyeColor();
-                if (dyecolor != this.getCollarColor()) {
-                    this.setCollarColor(dyecolor);
+                if (dyecolor.getTextureDiffuseColor() != this.getCollarColor()) {
+                    this.setCollarColor(dyecolor.getTextureDiffuseColor());
                     itemstack.consume(1, pPlayer);
                     return InteractionResult.SUCCESS;
                 }
@@ -394,12 +394,16 @@ public class Chickensaur extends TamableAnimal implements SmartBrainOwner<Chicke
         funny if we don't)*/
     }
 
-    public DyeColor getCollarColor() {
-        return DyeColor.byId((Integer)this.entityData.get(DATA_COLLAR_COLOR));
+    public int getCollarColor() {
+        return this.entityData.get(DATA_COLLAR_COLOR);
     }
 
     private void setCollarColor(DyeColor pCollarColor) {
         this.entityData.set(DATA_COLLAR_COLOR, pCollarColor.getId());
+    }
+
+    private void setCollarColor(int id) {
+        this.entityData.set(DATA_COLLAR_COLOR, id);
     }
 
 
@@ -806,7 +810,7 @@ public class Chickensaur extends TamableAnimal implements SmartBrainOwner<Chicke
         pCompound.putBoolean("saddled",isSaddled());
         pCompound.putInt("brushAmount",getBrushAmount());
         pCompound.putInt("regenScaleTicks", getRegenScaleTicks());
-        pCompound.putByte("collarColor", (byte)this.getCollarColor().getId());
+        pCompound.putInt("collarColor", this.getCollarColor());
         pCompound.putBoolean("isPickingUpItem", this.isPickingUpItem());
     }
 
@@ -818,7 +822,7 @@ public class Chickensaur extends TamableAnimal implements SmartBrainOwner<Chicke
         setBrushAmount(pCompound.getInt("brushAmount"));
         setRegenScalesTicks(pCompound.getInt("regenScaleTicks"));
         if (pCompound.contains("collarColor", 99)) {
-            this.setCollarColor(DyeColor.byId(pCompound.getInt("collarColor")));
+            this.setCollarColor(pCompound.getInt("collarColor"));
         }
         setPickingUpItem(pCompound.getBoolean("isPickingUpItem"));
     }
