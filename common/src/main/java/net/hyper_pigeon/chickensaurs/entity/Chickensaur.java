@@ -468,7 +468,7 @@ public class Chickensaur extends TamableAnimal implements SmartBrainOwner<Chicke
     public boolean hasNumbersAdvantaqe(LivingEntity potentialPrey) {
         double hunterFollowRange = this.getAttributeValue(Attributes.FOLLOW_RANGE);
         int numHunterAllies =  EntityRetrievalUtil.getEntities(this, hunterFollowRange, 10.0, hunterFollowRange, LivingEntity.class, (entity) -> entity.getType().equals(EntityRegistry.CHICKENSAUR.get())
-                && ((Chickensaur)entity).hasOwner()).size();
+                && !((Chickensaur)entity).hasOwner()).size();
         double preyFollowRange = this.getAttributeValue(Attributes.FOLLOW_RANGE);
         int numPreyAllies = EntityRetrievalUtil.getEntities(this, hunterFollowRange, 10.0, preyFollowRange, LivingEntity.class, (entity) -> entity.getType().equals(potentialPrey.getType())).size();
 
