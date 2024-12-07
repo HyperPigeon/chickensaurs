@@ -26,7 +26,7 @@ public class ChickensaurModel extends HierarchicalModel<Chickensaur> {
     private final ModelPart neck;
     private final ModelPart necku;
     private final ModelPart neckd;
-    private final ModelPart head;
+    public final ModelPart head;
     private final ModelPart beak;
     private final ModelPart beakd;
     private final ModelPart beaku;

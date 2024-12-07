@@ -62,6 +62,7 @@ neoForge {
 dependencies {
     implementation "net.tslat.smartbrainlib:SmartBrainLib-neoforge-1.21.1:${project.sbl_version}"
     implementation "maven.modrinth:past-el-palettes:${project.pastel_palletes_version}"
+    implementation "maven.modrinth:familiar-magic:${project.familiar_magic_version}"
     implementation("thedarkcolour:kotlinforforge-neoforge:$kff_version")
 }
 

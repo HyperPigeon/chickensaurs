@@ -10,5 +10,8 @@
   "injectors": {
     "defaultRequire": 1
   },
-  "plugin": "net.hyper_pigeon.chickensaurs.compat.ChickensaurMixinPlugin"
+  "plugin": "net.hyper_pigeon.chickensaurs.compat.ChickensaurMixinPlugin",
+  "client": [
+    "compat.familiar_magic.ChickensaurHatRendererMixin"
+  ]
 }
