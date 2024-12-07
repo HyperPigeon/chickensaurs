@@ -30,7 +30,7 @@ public class ChickensaursFabric implements ModInitializer {
 
         EntityRegistry.registerEntityAttributes(FabricDefaultAttributeRegistry::register);
         SpawnPlacements.register(EntityRegistry.CHICKENSAUR.get(), SpawnPlacementTypes.ON_GROUND, Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, Chickensaur::checkChickensaurSpawnRules);
-        BiomeModifications.addSpawn(BiomeSelectors.tag(Constants.CHICKENSAUR_SPAWN_BIOMES), MobCategory.CREATURE, EntityRegistry.CHICKENSAUR.get(), 150, 3,4);
+        BiomeModifications.addSpawn(BiomeSelectors.tag(Constants.CHICKENSAUR_SPAWN_BIOMES), MobCategory.CREATURE, EntityRegistry.CHICKENSAUR.get(), 300, 3,6);
         ItemGroupEvents.modifyEntriesEvent(CreativeModeTabs.FOOD_AND_DRINKS).register(content -> {
             content.addAfter(Items.COOKED_CHICKEN, ItemRegistry.CHICKENSAUR.get());
             content.addAfter(ItemRegistry.CHICKENSAUR.get(), ItemRegistry.COOKED_CHICKENSAUR.get());

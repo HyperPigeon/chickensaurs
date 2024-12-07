@@ -577,15 +577,6 @@ public class Chickensaur extends TamableAnimal implements SmartBrainOwner<Chicke
         return true;
     }
 
-    public void forgivePlayer(ServerPlayer target){
-        if(target.level().getGameRules().getBoolean(GameRules.RULE_FORGIVE_DEAD_PLAYERS) && BrainUtils.hasMemory(this,MemoryModuleType.HURT_BY_ENTITY) ) {
-            Entity lastHurtBy = BrainUtils.getMemory(this, MemoryModuleType.HURT_BY_ENTITY);
-            if(lastHurtBy != null && lastHurtBy.is(target)) {
-                BrainUtils.clearMemory(this, MemoryModuleType.HURT_BY_ENTITY);
-            }
-        }
-    }
-
     public void spawnChildFromBreeding(ServerLevel pLevel, Animal pMate) {
         ItemStack itemstack = new ItemStack(ItemRegistry.CHICKENSAUR_EGG.get());
         ItemEntity itementity = new ItemEntity(pLevel, this.position().x(), this.position().y(), this.position().z(), itemstack);
@@ -642,7 +633,7 @@ public class Chickensaur extends TamableAnimal implements SmartBrainOwner<Chicke
         return BrainActivityGroup.idleTasks(
                 new FirstApplicableBehaviour(
                         new TargetOrRetaliate<Chickensaur>().alertAlliesWhen((chickensaur, attacker) -> attacker != null && chickensaur.canAttackTarget((LivingEntity) attacker)).attackablePredicate(this::canAttackTarget),
-                        new IntimidateLivingEntity<Chickensaur>().runFor((entity) -> 200).startCondition((entity) -> !entity.hasOwner() && !entity.isBaby()),
+                        new IntimidateLivingEntity<Chickensaur>().runFor((entity) -> 200).startCondition((entity) -> !this.hasOwner() && !this.isBaby()),
                         new MoveToNearestVisibleWantedItem<Chickensaur>().cooldownFor((entity) -> 100)
                             .whenStarting((chickensaur) -> chickensaur.setPickingUpItem(true)),
                         new BreedWithPartner<Chickensaur>(),

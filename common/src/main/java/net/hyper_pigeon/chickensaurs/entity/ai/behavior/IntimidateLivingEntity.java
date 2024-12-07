@@ -37,10 +37,6 @@ public class IntimidateLivingEntity<E extends PathfinderMob> extends ExtendedBeh
         return livingEntity.getType().is(Constants.INTIMIDATE) && !isInCreative;
     }
 
-    public boolean canIntimidatePossiblePlayer(LivingEntity target, Chickensaur chickensaur) {
-        return !(target.getType().equals(EntityType.PLAYER) && chickensaur.hasOwner());
-    }
-
 
     @Override
     protected boolean checkExtraStartConditions(ServerLevel level, E entity) {
