@@ -125,7 +125,7 @@ public class Chickensaur extends TamableAnimal implements SmartBrainOwner<Chicke
         super(pEntityType, pLevel);
         this.shedTime = this.random.nextInt(3000) + 3000;
         this.setPathfindingMalus(PathType.DANGER_FIRE, 0.0F);
-        this.setPathfindingMalus(PathType.DAMAGE_FIRE, 0.0F);
+        this.setPathfindingMalus(PathType.DAMAGE_FIRE, -1.0F);
     }
 
     @Override
@@ -197,20 +197,6 @@ public class Chickensaur extends TamableAnimal implements SmartBrainOwner<Chicke
                     }
                 }
             }
-
-            //as of right now, this code results in some weird behavior and might be too destructive.
-//            if(getIntimidatingTicks() > 40) {
-//                if(this.random.nextDouble() < 0.10) {
-//                    BlockPos blockPos = this.getBlockPosBelowThatAffectsMyMovement();
-//                    BlockPos fireBlockPos = new BlockPos(blockPos.getX() + this.random.nextIntBetweenInclusive(1,3), blockPos.getY(), blockPos.getZ() + this.random.nextIntBetweenInclusive(1,3));
-//                    if(BaseFireBlock.canBePlacedAt(level(), fireBlockPos, Direction.getRandom(this.random))) {
-//                        level().playSound(null,fireBlockPos,SoundEvents.FLINTANDSTEEL_USE, SoundSource.BLOCKS, 1.0F, level().getRandom().nextFloat() * 0.4F + 0.8F);
-//                        level().setBlockAndUpdate(fireBlockPos, BaseFireBlock.getState(level(), fireBlockPos));
-//                        level().gameEvent(null, GameEvent.BLOCK_PLACE, fireBlockPos);
-//                    }
-//                }
-//            }
-
             incrementIntimidatingTicks();
         }
         else {
@@ -389,9 +375,6 @@ public class Chickensaur extends TamableAnimal implements SmartBrainOwner<Chicke
         }
 
         return InteractionResult.FAIL;
-
-        /*we'll probably have to add a clause here that prevents the player from brushing the chickensaur if its aggressive (though it might be
-        funny if we don't)*/
     }
 
     public int getCollarColor() {
@@ -414,7 +397,6 @@ public class Chickensaur extends TamableAnimal implements SmartBrainOwner<Chicke
         } else {
             this.spawnAtLocation(new ItemStack(Items.IRON_NUGGET));
             this.gameEvent(GameEvent.ENTITY_INTERACT);
-            this.playSound(SoundEvents.ARMADILLO_BRUSH);
             this.setBrushAmount(brushAmount-1);
             return true;
         }
@@ -633,7 +615,7 @@ public class Chickensaur extends TamableAnimal implements SmartBrainOwner<Chicke
         return BrainActivityGroup.idleTasks(
                 new FirstApplicableBehaviour(
                         new TargetOrRetaliate<Chickensaur>().alertAlliesWhen((chickensaur, attacker) -> attacker != null && chickensaur.canAttackTarget((LivingEntity) attacker)).attackablePredicate(this::canAttackTarget),
-                        new IntimidateLivingEntity<Chickensaur>().runFor((entity) -> 200).startCondition((entity) -> !this.hasOwner() && !this.isBaby()),
+                        new IntimidateLivingEntity<Chickensaur>().runFor((entity) -> 200).startCondition((entity) -> !this.hasOwner() && !this.isBaby()).cooldownFor(entity -> 100),
                         new MoveToNearestVisibleWantedItem<Chickensaur>().cooldownFor((entity) -> 100)
                             .whenStarting((chickensaur) -> chickensaur.setPickingUpItem(true)),
                         new BreedWithPartner<Chickensaur>(),
