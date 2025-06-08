@@ -23,5 +23,6 @@ public class Chickensaurs {
         ItemRegistry.init();
         SoundRegistry.init();
         ChickensaurMemoryTypes.init();
+        StructureRegistry.init();
     }
 }
