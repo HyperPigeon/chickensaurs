@@ -10,7 +10,9 @@ import java.util.function.Supplier;
 
 public class EntityRegistry {
 
-    public static final Supplier<EntityType<Chickensaur>> CHICKENSAUR = registerEntity("chickensaur", Chickensaur::new, 0.9F, 1.2F, MobCategory.AXOLOTLS);
+    public static final MobCategory CHICKENSAUR_CATEGORY = CategoryRegistry.CHICKENSAUR;
+
+    public static final Supplier<EntityType<Chickensaur>> CHICKENSAUR = registerEntity("chickensaur", Chickensaur::new, 0.9F, 1.2F, CHICKENSAUR_CATEGORY);
 
     public static void init(){
 

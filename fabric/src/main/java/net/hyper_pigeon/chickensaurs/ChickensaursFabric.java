@@ -6,6 +6,7 @@ import net.fabricmc.fabric.api.biome.v1.BiomeSelectors;
 import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
 import net.fabricmc.fabric.api.object.builder.v1.entity.FabricDefaultAttributeRegistry;
 import net.hyper_pigeon.chickensaurs.entity.Chickensaur;
+import net.hyper_pigeon.chickensaurs.register.CategoryRegistry;
 import net.hyper_pigeon.chickensaurs.register.EntityRegistry;
 import net.hyper_pigeon.chickensaurs.register.ItemRegistry;
 import net.minecraft.core.registries.Registries;
@@ -30,7 +31,7 @@ public class ChickensaursFabric implements ModInitializer {
 
         EntityRegistry.registerEntityAttributes(FabricDefaultAttributeRegistry::register);
         SpawnPlacements.register(EntityRegistry.CHICKENSAUR.get(), SpawnPlacementTypes.ON_GROUND, Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, Chickensaur::checkChickensaurSpawnRules);
-        BiomeModifications.addSpawn(BiomeSelectors.tag(Constants.CHICKENSAUR_SPAWN_BIOMES), MobCategory.CREATURE, EntityRegistry.CHICKENSAUR.get(), 300, 3,6);
+        BiomeModifications.addSpawn(BiomeSelectors.tag(Constants.CHICKENSAUR_SPAWN_BIOMES), EntityRegistry.CHICKENSAUR_CATEGORY, EntityRegistry.CHICKENSAUR.get(), 300, 3,6);
         ItemGroupEvents.modifyEntriesEvent(CreativeModeTabs.FOOD_AND_DRINKS).register(content -> {
             content.addAfter(Items.COOKED_CHICKEN, ItemRegistry.CHICKENSAUR.get());
             content.addAfter(ItemRegistry.CHICKENSAUR.get(), ItemRegistry.COOKED_CHICKENSAUR.get());
