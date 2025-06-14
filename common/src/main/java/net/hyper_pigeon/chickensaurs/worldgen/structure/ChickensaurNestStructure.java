@@ -37,8 +37,8 @@ public class ChickensaurNestStructure extends Structure {
 
     public Optional<Structure.GenerationStub> findGenerationPoint(Structure.GenerationContext context) {
         WorldgenRandom worldgenRandom = context.random();
-        int i = context.chunkPos().getMinBlockX() + worldgenRandom.nextInt(16);
-        int j = context.chunkPos().getMinBlockZ() + worldgenRandom.nextInt(16);
+        int i = context.chunkPos().getMiddleBlockX();
+        int j = context.chunkPos().getMiddleBlockZ();
         int k = context.chunkGenerator().getSeaLevel();
         WorldGenerationContext worldGenerationContext = new WorldGenerationContext(context.chunkGenerator(), context.heightAccessor());
         int l = this.height.sample(worldgenRandom, worldGenerationContext);

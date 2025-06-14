@@ -4,9 +4,9 @@
   "spawners": [
     {
       "type": "chickensaurs:chickensaur",
-      "weight": 300,
-      "minCount": 3,
-      "maxCount": 6
+      "weight": 2,
+      "minCount": 2,
+      "maxCount": 2
     }
   ]
 }

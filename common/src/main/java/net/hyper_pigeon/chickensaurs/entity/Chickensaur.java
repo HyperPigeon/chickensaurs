@@ -498,7 +498,7 @@ public class Chickensaur extends TamableAnimal implements SmartBrainOwner<Chicke
     }
 
     public boolean canAttackTooClosePossiblePlayer(LivingEntity target) {
-        return !(target.getType().equals(EntityType.PLAYER) && hasOwner());
+        return !(EntityType.PLAYER.equals(target.getType()) && hasOwner());
     }
 
     public boolean canAttackTarget(LivingEntity target) {

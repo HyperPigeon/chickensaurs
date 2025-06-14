@@ -1,0 +1,9 @@
+{
+  "type": "neoforge:add_spawn_costs",
+  "biomes": "#namespace:biome_tag",
+  "entity_types": "chickensaurs:chickensaur",
+  "spawn_cost": {
+    "energy_budget": 0.15,
+    "charge": 0.7
+  }
+}
