@@ -34,17 +34,17 @@ public class ChickensaurNestGenerator {
 
     public static class Piece extends TemplateStructurePiece {
         public Piece(StructureTemplateManager manager, ResourceLocation template, BlockPos pos, Rotation rotation) {
-            super(StructureRegistry.CHICKENSAUR_NEST_PIECES, 0, manager, template, template.toString(), createPlacementData(rotation), pos);
+            super(StructureRegistry.CHICKENSAUR_NEST_PIECES.get(), 0, manager, template, template.toString(), createPlacementData(rotation), pos);
         }
 
         public Piece(StructureTemplateManager manager, CompoundTag nbt) {
-            super(StructureRegistry.CHICKENSAUR_NEST_PIECES, nbt, manager, (id) -> {
+            super(StructureRegistry.CHICKENSAUR_NEST_PIECES.get(), nbt, manager, (id) -> {
                 return createPlacementData(Rotation.valueOf(nbt.getString("Rot")));
             });
         }
 
         public Piece(StructurePieceSerializationContext structureContext, CompoundTag nbt) {
-            super(StructureRegistry.CHICKENSAUR_NEST_PIECES, nbt, structureContext.structureTemplateManager(), (id) -> {
+            super(StructureRegistry.CHICKENSAUR_NEST_PIECES.get(), nbt, structureContext.structureTemplateManager(), (id) -> {
                 return createPlacementData(Rotation.valueOf(nbt.getString("Rot")));
             });
         }

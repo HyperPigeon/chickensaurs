@@ -1,5 +1,6 @@
 package net.hyper_pigeon.chickensaurs.platform.services;
 
+import com.mojang.serialization.MapCodec;
 import net.minecraft.core.Holder;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.effect.MobEffect;
@@ -12,6 +13,10 @@ import net.minecraft.world.item.SpawnEggItem;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.levelgen.structure.Structure;
+import net.minecraft.world.level.levelgen.structure.StructurePiece;
+import net.minecraft.world.level.levelgen.structure.StructureType;
+import net.minecraft.world.level.levelgen.structure.pieces.StructurePieceType;
 
 import java.util.function.Supplier;
 
@@ -56,6 +61,8 @@ public interface IPlatformHelper {
     Holder<MobEffect> registerMobEffect(String name, MobEffect mobEffect);
     <T extends SoundEvent> Supplier<T> registerSound(String id, Supplier<T> sound);
     <T extends CreativeModeTab> Supplier<T> registerCreativeModeTab(String id, Supplier<T> tab);
+    <S extends Structure, T extends StructureType<S>> Supplier<T> registerStructureType(String id, Supplier<MapCodec<S>> mapCodec);
+    <T extends StructurePieceType> Supplier<T> registerStructurePieceType(String id, Supplier<T> structurePiece);
     <E extends Mob> Supplier<SpawnEggItem> makeSpawnEggFor(Supplier<EntityType<E>> entityType, int primaryEggColour, int secondaryEggColour, Item.Properties itemProperties);
     CreativeModeTab.Builder newCreativeTabBuilder();
 }

@@ -1,12 +1,15 @@
 package net.hyper_pigeon.chickensaurs.platform;
 
+import com.mojang.serialization.MapCodec;
 import net.fabricmc.fabric.api.itemgroup.v1.FabricItemGroup;
 import net.hyper_pigeon.chickensaurs.Constants;
 import net.hyper_pigeon.chickensaurs.platform.services.IPlatformHelper;
 import net.fabricmc.loader.api.FabricLoader;
+import net.hyper_pigeon.chickensaurs.worldgen.structure.ChickensaurNestStructure;
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.effect.MobEffect;
@@ -19,6 +22,9 @@ import net.minecraft.world.item.SpawnEggItem;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.levelgen.structure.Structure;
+import net.minecraft.world.level.levelgen.structure.StructureType;
+import net.minecraft.world.level.levelgen.structure.pieces.StructurePieceType;
 
 import java.util.function.Supplier;
 
@@ -77,6 +83,20 @@ public class FabricPlatformHelper implements IPlatformHelper {
     }
 
     @Override
+    public <S extends Structure, T extends StructureType<S>> Supplier<T> registerStructureType(String id, Supplier<MapCodec<S>> mapCodec) {
+        final Object registeredObject = Registry.register
+                (BuiltInRegistries.STRUCTURE_TYPE,
+                        ResourceLocation.fromNamespaceAndPath(Constants.MOD_ID, id),
+                        () -> (MapCodec<Structure>) mapCodec.get());
+        return () -> (T) registeredObject;
+    }
+
+    @Override
+    public <T extends StructurePieceType> Supplier<T> registerStructurePieceType(String id, Supplier<T> structurePiece) {
+        return registerSupplier(BuiltInRegistries.STRUCTURE_PIECE, id, structurePiece);
+    }
+
+    @Override
     public <E extends Mob> Supplier<SpawnEggItem> makeSpawnEggFor(Supplier<EntityType<E>> entityType, int primaryEggColour, int secondaryEggColour, Item.Properties itemProperties) {
         return () -> new SpawnEggItem(entityType.get(), primaryEggColour, secondaryEggColour, itemProperties);
     }
@@ -94,6 +114,4 @@ public class FabricPlatformHelper implements IPlatformHelper {
 
         return () -> registeredObject;
     }
-
-
 }

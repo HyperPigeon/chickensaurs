@@ -1,5 +1,6 @@
 package net.hyper_pigeon.chickensaurs.platform;
 
+import com.mojang.serialization.MapCodec;
 import net.hyper_pigeon.chickensaurs.ChickensaursNeoForge;
 import net.hyper_pigeon.chickensaurs.platform.services.IPlatformHelper;
 import net.minecraft.core.Holder;
@@ -14,6 +15,9 @@ import net.minecraft.world.item.SpawnEggItem;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.levelgen.structure.Structure;
+import net.minecraft.world.level.levelgen.structure.StructureType;
+import net.minecraft.world.level.levelgen.structure.pieces.StructurePieceType;
 import net.neoforged.fml.ModList;
 import net.neoforged.fml.loading.FMLLoader;
 import net.neoforged.neoforge.common.DeferredSpawnEggItem;
@@ -73,6 +77,21 @@ public class NeoForgePlatformHelper implements IPlatformHelper {
     public <T extends CreativeModeTab> Supplier<T> registerCreativeModeTab(String id, Supplier<T> tab) {
         return ChickensaursNeoForge.CREATIVE_TABS.register(id, tab);
     }
+
+    @Override
+    public <S extends Structure, T extends StructureType<S>> Supplier<T> registerStructureType(String id, Supplier<MapCodec<S>> mapCodec) {
+        return (Supplier<T>) ChickensaursNeoForge.STRUCTURE_TYPE.register(id,() -> explicitStructureTypeTyping(mapCodec.get()));
+    }
+
+    @Override
+    public <T extends StructurePieceType> Supplier<T> registerStructurePieceType(String id, Supplier<T> structurePiece) {
+        return ChickensaursNeoForge.STRUCTURE_PIECE_TYPE.register(id,structurePiece);
+    }
+
+    private static <T extends Structure> StructureType<T> explicitStructureTypeTyping(MapCodec<T> structureCodec) {
+        return () -> structureCodec;
+    }
+
 
     @Override
     public <E extends Mob> Supplier<SpawnEggItem> makeSpawnEggFor(Supplier<EntityType<E>> entityType, int primaryEggColour, int secondaryEggColour, Item.Properties itemProperties) {

@@ -66,6 +66,6 @@ public class ChickensaurNestStructure extends Structure {
 
     @Override
     public StructureType<?> type() {
-        return StructureRegistry.CHICKENSAUR_NEST;
+        return StructureRegistry.CHICKENSAUR_NEST.get();
     }
 }
