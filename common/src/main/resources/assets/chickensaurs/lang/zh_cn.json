@@ -1,0 +1,25 @@
+{
+  "entity.chickensaurs.chickensaur": "恐鸟",
+  "itemGroup.chickensaurs.chickensaurs_items": "恐鸟物品",
+  "item.chickensaurs.chickensaur": "生恐鸟肉",
+  "item.chickensaurs.cooked_chickensaur": "熟恐鸟肉",
+  "item.chickensaurs.chickensaur_nuggets": "恐鸟块",
+  "item.chickensaurs.chickensaur_spawn_egg": "恐鸟生成蛋",
+  "block.chickensaurs.chickensaur_egg": "恐鸟蛋",
+
+  "tag.chickensaurs.block.guarded_by_chickensaurs": "被恐鸟守护的方块",
+  "tag.chickensaurs.entity_type.chickensur_group_hunt": "恐鸟群体狩猎目标",
+  "tag.chickensaurs.entity_type.chickensur_hunt": "恐鸟狩猎目标",
+  "tag.chickensaurs.entity_type.chickensur_intimidate": "恐鸟威慑目标",
+  "tag.chickensaurs.items.chickensaur_food": "恐鸟食物",
+  "tag.chickensaurs.worldgen.biome.chickensaur_spawn_biomes": "恐鸟生成生物群系",
+
+  "sounds.chickensaurs.chickensaur_brush": "梳理恐鸟",
+  "sounds.chickensaurs.chickensaur_hurt_one": "恐鸟受伤",
+  "sounds.chickensaurs.chickensaur_hurt_two": "恐鸟死亡",
+  "sounds.chickensaurs.chickensaur_idle_one": "恐鸟咯咯叫",
+  "sounds.chickensaurs.chickensaur_idle_two": "恐鸟咯咯叫",
+  "sounds.chickensaurs.chickensaur_step_one": "脚步声",
+  "sounds.chickensaurs.chickensaur_step_two": "脚步声",
+  "sounds.chickensaurs.chickensaur_threaten": "恐鸟警告入侵者"
+}
