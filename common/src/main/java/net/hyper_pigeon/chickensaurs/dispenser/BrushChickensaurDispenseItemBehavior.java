@@ -18,7 +18,7 @@ public class BrushChickensaurDispenseItemBehavior extends OptionalDispenseItemBe
             BlockPos blockpos = pBlockSource.pos().relative(pBlockSource.state().getValue(DispenserBlock.FACING));
             this.setSuccess(tryBrushChickensaur(serverlevel, blockpos, pItem));
             if (this.isSuccess()) {
-                pItem.hurtAndBreak(1, serverlevel, null, p_348118_ -> {
+                pItem.hurtAndBreak(16, serverlevel, null, p_348118_ -> {
                 });
             }
         }
