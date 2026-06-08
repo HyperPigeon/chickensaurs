@@ -17,7 +17,7 @@ import net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent;
 public class ChickensaursNeoForgeClient {
     @SubscribeEvent
     public static void registerRenderers(final EntityRenderersEvent.RegisterRenderers event) {
-        ChickensaursClient.registerRenderers(event::registerEntityRenderer, event::registerBlockEntityRenderer);
+        ChickensaursClient.registerRenderers(event::registerEntityRenderer);
     }
 
     @SubscribeEvent

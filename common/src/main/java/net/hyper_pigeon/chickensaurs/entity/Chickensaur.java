@@ -726,7 +726,7 @@ public class Chickensaur extends TamableAnimal implements SmartBrainOwner<Chicke
         double d1 = this.getBoundingBox().minY;
         double d2 = this.getZ() + pDirection.z;
         BlockPos.MutableBlockPos blockpos$mutableblockpos = new BlockPos.MutableBlockPos();
-        UnmodifiableIterator var10 = pPassenger.getDismountPoses().iterator();
+        UnmodifiableIterator<Pose> var10 = pPassenger.getDismountPoses().iterator();
 
         while(var10.hasNext()) {
             Pose pose = (Pose)var10.next();
