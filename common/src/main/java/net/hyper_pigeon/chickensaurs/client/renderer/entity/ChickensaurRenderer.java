@@ -13,7 +13,9 @@ public class ChickensaurRenderer extends MobRenderer<Chickensaur, ChickensaurMod
 
     private static final ResourceLocation DEFAULT = ResourceLocation.fromNamespaceAndPath(Constants.MOD_ID,"textures/entity/chickensaur/chickensaur.png");
     private static final ResourceLocation SADDLE = ResourceLocation.fromNamespaceAndPath(Constants.MOD_ID,"textures/entity/chickensaur/chickensaur_saddle.png");
-    private static final ResourceLocation BRUSHED = ResourceLocation.fromNamespaceAndPath(Constants.MOD_ID, "textures/entity/chickensaur/chickensaur_brushed.png");
+    private static final ResourceLocation SCALES_LEVEL_0 = ResourceLocation.fromNamespaceAndPath(Constants.MOD_ID, "textures/entity/chickensaur/chickensaur_0.png");
+    private static final ResourceLocation SCALES_LEVEL_1 = ResourceLocation.fromNamespaceAndPath(Constants.MOD_ID, "textures/entity/chickensaur/chickensaur_1.png");
+    private static final ResourceLocation SCALES_LEVEL_2 = ResourceLocation.fromNamespaceAndPath(Constants.MOD_ID, "textures/entity/chickensaur/chickensaur_2.png");
 
 
     public ChickensaurRenderer(EntityRendererProvider.Context pContext) {
@@ -29,9 +31,12 @@ public class ChickensaurRenderer extends MobRenderer<Chickensaur, ChickensaurMod
     @Override
     public ResourceLocation getTextureLocation(Chickensaur chickensaur) {
         if(chickensaur.getBrushAmount() <= 0) {
-            return BRUSHED;
+            return SCALES_LEVEL_0;
+        } else if (chickensaur.getBrushAmount() == 1) {
+            return SCALES_LEVEL_1;
+        } else if (chickensaur.getBrushAmount() == 2) {
+            return SCALES_LEVEL_2;
         }
         return DEFAULT;
-
     }
 }

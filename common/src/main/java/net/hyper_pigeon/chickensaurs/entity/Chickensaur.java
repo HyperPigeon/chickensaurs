@@ -99,7 +99,7 @@ public class Chickensaur extends TamableAnimal implements SmartBrainOwner<Chicke
 
     private static final Vec3i ITEM_PICKUP_RANGE_EXPANDER = new Vec3i(1,1,1);
     private static final int MAX_BRUSH_AMOUNT = 3;
-    private static final int REGEN_SCALE_TIME = 1000;
+    private static final int REGEN_SCALE_TIME = 2000;
 
     private static final EntityDataAccessor<Boolean> INTIMIDATING = SynchedEntityData.defineId(Chickensaur.class, EntityDataSerializers.BOOLEAN);
     private static final EntityDataAccessor<Integer> INTIMIDATING_TICKS = SynchedEntityData.defineId(Chickensaur.class, EntityDataSerializers.INT);
@@ -212,9 +212,9 @@ public class Chickensaur extends TamableAnimal implements SmartBrainOwner<Chicke
         }
 
 
-        if(getBrushAmount() <= 0) {
+        if(getBrushAmount() < MAX_BRUSH_AMOUNT) {
             if(getRegenScaleTicks() > REGEN_SCALE_TIME) {
-                setBrushAmount(MAX_BRUSH_AMOUNT);
+                setBrushAmount(getBrushAmount()+1);
                 setRegenScalesTicks(0);
             }
             else {
@@ -317,7 +317,7 @@ public class Chickensaur extends TamableAnimal implements SmartBrainOwner<Chicke
     public InteractionResult mobInteract(Player pPlayer, InteractionHand pHand) {
         ItemStack itemstack = pPlayer.getItemInHand(pHand);
         if (itemstack.is(Items.BRUSH) && this.brushOffIronNuggets()) {
-            itemstack.hurtAndBreak(24, pPlayer, getSlotForHand(pHand));
+            itemstack.hurtAndBreak(16, pPlayer, getSlotForHand(pHand));
             level().playSound(null,this.getX(), this.getY(), this.getZ(), SoundRegistry.BRUSH.get(), SoundSource.NEUTRAL, 1.0F, 1.0F + (level().random.nextFloat() - level().random.nextFloat()) * 0.4F);
             return InteractionResult.sidedSuccess(this.level().isClientSide);
         }
@@ -387,9 +387,11 @@ public class Chickensaur extends TamableAnimal implements SmartBrainOwner<Chicke
         if (this.isBaby() || brushAmount <= 0) {
             return false;
         } else {
-            this.spawnAtLocation(new ItemStack(Items.IRON_NUGGET));
+            for (int i = getBrushAmount(); i > 0; i--) {
+                this.spawnAtLocation(new ItemStack(Items.IRON_NUGGET, getRandom().nextIntBetweenInclusive(1,2)));
+            }
             this.gameEvent(GameEvent.ENTITY_INTERACT);
-            this.setBrushAmount(brushAmount-1);
+            this.setBrushAmount(0);
             return true;
         }
     }

@@ -12,7 +12,9 @@ public class ChickensaursClientFabric implements ClientModInitializer {
         ChickensaursClient.registerRenderers(EntityRendererRegistry::register, BlockEntityRenderers::register);
         EntityModelLayerRegistry.registerModelLayer(ChickensaurModel.LAYER_LOCATION, ChickensaurModel::createBodyLayer);
         EntityModelLayerRegistry.registerModelLayer(ChickensaurModel.SADDLE_LAYER_LOCATION, ChickensaurModel::createBodyLayer);
-        EntityModelLayerRegistry.registerModelLayer(ChickensaurModel.BRUSHED_LAYER_LOCATION, ChickensaurModel::createBodyLayer);
+        EntityModelLayerRegistry.registerModelLayer(ChickensaurModel.SCALE_LEVEL_0_LOCATION, ChickensaurModel::createBodyLayer);
+        EntityModelLayerRegistry.registerModelLayer(ChickensaurModel.SCALE_LEVEL_1_LOCATION, ChickensaurModel::createBodyLayer);
+        EntityModelLayerRegistry.registerModelLayer(ChickensaurModel.SCALE_LEVEL_2_LOCATION, ChickensaurModel::createBodyLayer);
         EntityModelLayerRegistry.registerModelLayer(ChickensaurModel.BAND_LAYER_LOCATION, ChickensaurModel::createBodyLayer);
     }
 }
