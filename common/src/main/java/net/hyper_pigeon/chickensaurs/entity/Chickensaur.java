@@ -96,7 +96,6 @@ public class Chickensaur extends TamableAnimal implements SmartBrainOwner<Chicke
     public float oFlap;
     public float flapping = 1.0F;
     private float nextFlap = 1.0F;
-    public int shedTime;
 
     private static final Vec3i ITEM_PICKUP_RANGE_EXPANDER = new Vec3i(1,1,1);
     private static final int MAX_BRUSH_AMOUNT = 3;
@@ -123,7 +122,6 @@ public class Chickensaur extends TamableAnimal implements SmartBrainOwner<Chicke
 
     public Chickensaur(EntityType<? extends TamableAnimal> pEntityType, Level pLevel) {
         super(pEntityType, pLevel);
-        this.shedTime = this.random.nextInt(3000) + 3000;
         this.setPathfindingMalus(PathType.DANGER_FIRE, 0.0F);
         this.setPathfindingMalus(PathType.DAMAGE_FIRE, -1.0F);
     }
@@ -173,12 +171,6 @@ public class Chickensaur extends TamableAnimal implements SmartBrainOwner<Chicke
         }
 
         this.flap += this.flapping * 2.0F;
-        if (!this.level().isClientSide && this.isAlive() && !this.isBaby() &&  --this.shedTime <= 0) {
-            this.playSound(SoundEvents.CHICKEN_EGG, 1.0F, (this.random.nextFloat() - this.random.nextFloat()) * 0.2F + 1.0F);
-            this.spawnAtLocation(Items.IRON_NUGGET);
-            this.gameEvent(GameEvent.ENTITY_PLACE);
-            this.shedTime = this.random.nextInt(6000) + 6000;
-        }
 
         if(isIntimidating()) {
             if(this.level().isClientSide) {
