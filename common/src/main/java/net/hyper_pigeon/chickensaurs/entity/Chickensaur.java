@@ -314,11 +314,29 @@ public class Chickensaur extends TamableAnimal implements SmartBrainOwner<Chicke
         return aABB.inflate(0.6, 0.1, 0.6);
     }
 
-    public InteractionResult mobInteract(Player pPlayer, InteractionHand pHand) {
-        ItemStack itemstack = pPlayer.getItemInHand(pHand);
+    public boolean brush(ItemStack itemstack) {
+        if (itemstack.is(Items.BRUSH) && this.brushOffIronNuggets()) {
+            level().playSound(null, this.getX(), this.getY(), this.getZ(), SoundRegistry.BRUSH.get(), SoundSource.NEUTRAL, 1.0F, 1.0F + (level().random.nextFloat() - level().random.nextFloat()) * 0.4F);
+            return true;
+        }
+
+        return false;
+    }
+
+    public boolean brush(ItemStack itemstack, Player pPlayer, InteractionHand pHand) {
         if (itemstack.is(Items.BRUSH) && this.brushOffIronNuggets()) {
             itemstack.hurtAndBreak(16, pPlayer, getSlotForHand(pHand));
-            level().playSound(null,this.getX(), this.getY(), this.getZ(), SoundRegistry.BRUSH.get(), SoundSource.NEUTRAL, 1.0F, 1.0F + (level().random.nextFloat() - level().random.nextFloat()) * 0.4F);
+            level().playSound(null, this.getX(), this.getY(), this.getZ(), SoundRegistry.BRUSH.get(), SoundSource.NEUTRAL, 1.0F, 1.0F + (level().random.nextFloat() - level().random.nextFloat()) * 0.4F);
+            return true;
+        }
+
+        return false;
+    }
+
+    public InteractionResult mobInteract(Player pPlayer, InteractionHand pHand) {
+        ItemStack itemstack = pPlayer.getItemInHand(pHand);
+
+        if (this.brush(itemstack, pPlayer, pHand)) {
             return InteractionResult.sidedSuccess(this.level().isClientSide);
         }
         else if(canTame()) {
