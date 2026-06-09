@@ -442,7 +442,7 @@ public class Chickensaur extends TamableAnimal implements SmartBrainOwner<Chicke
         BlockPos blockPos = this.getBlockPosBelowThatAffectsMyMovement();
         BlockState blockState = this.level().getBlockState(blockPos);
         if(blockState.is(BlockTags.SOUL_SPEED_BLOCKS)){
-            return 1.3F;
+            return 1.35F;
         }
         return super.getBlockSpeedFactor();
     }
@@ -629,7 +629,7 @@ public class Chickensaur extends TamableAnimal implements SmartBrainOwner<Chicke
                         new BreedWithPartner<Chickensaur>(),
                         new OneRandomBehaviour(
                                 new SetRandomLookTarget<Chickensaur>(),
-                                new SetRandomWalkTarget<Chickensaur>().setRadius(5).speedModifier(0.75F).cooldownFor((entity) -> 150),
+                                new SetRandomWalkTarget<Chickensaur>().setRadius(5).speedModifier(0.6F).cooldownFor((entity) -> 150),
                                 new Idle<>().runFor(entity -> entity.getRandom().nextIntBetweenInclusive(30,60))
                         )
                 )
@@ -652,7 +652,7 @@ public class Chickensaur extends TamableAnimal implements SmartBrainOwner<Chicke
     }
 
     public static AttributeSupplier.Builder createAttributes() {
-        return Mob.createMobAttributes().add(Attributes.MOVEMENT_SPEED, 0.37500001192092896)
+        return Mob.createMobAttributes().add(Attributes.MOVEMENT_SPEED, 0.28)
                 .add(Attributes.MAX_HEALTH, 25.0).add(Attributes.ATTACK_DAMAGE, 8.0)
                 .add(Attributes.ARMOR, 12F)
                 .add(Attributes.FOLLOW_RANGE,16F);
