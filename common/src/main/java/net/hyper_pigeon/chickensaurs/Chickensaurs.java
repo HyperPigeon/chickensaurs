@@ -1,6 +1,5 @@
 package net.hyper_pigeon.chickensaurs;
 
-import net.hyper_pigeon.chickensaurs.dispenser.BrushChickensaurDispenseItemBehavior;
 import net.hyper_pigeon.chickensaurs.entity.ai.memory_types.ChickensaurMemoryTypes;
 import net.hyper_pigeon.chickensaurs.platform.Services;
 import net.hyper_pigeon.chickensaurs.register.*;
@@ -30,7 +29,5 @@ public class Chickensaurs {
         SoundRegistry.init();
         ChickensaurMemoryTypes.init();
         StructureRegistry.init();
-
-        DispenserBlock.registerBehavior(Items.BRUSH.asItem(), new BrushChickensaurDispenseItemBehavior());
     }
 }
