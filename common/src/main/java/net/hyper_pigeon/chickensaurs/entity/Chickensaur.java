@@ -135,7 +135,7 @@ public class Chickensaur extends TamableAnimal implements SmartBrainOwner<Chicke
         pBuilder.define(SADDLED, false);
         pBuilder.define(BRUSH_AMOUNT,MAX_BRUSH_AMOUNT);
         pBuilder.define(REGEN_SCALES_TICKS, 0);
-        pBuilder.define(DATA_COLLAR_COLOR, DyeColor.WHITE.getId());
+        pBuilder.define(DATA_COLLAR_COLOR, DyeColor.RED.getTextureDiffuseColor());
         pBuilder.define(PICKING_UP_ITEM, false);
     }
 
@@ -391,12 +391,8 @@ public class Chickensaur extends TamableAnimal implements SmartBrainOwner<Chicke
         return this.entityData.get(DATA_COLLAR_COLOR);
     }
 
-    private void setCollarColor(DyeColor pCollarColor) {
-        this.entityData.set(DATA_COLLAR_COLOR, pCollarColor.getId());
-    }
-
-    private void setCollarColor(int id) {
-        this.entityData.set(DATA_COLLAR_COLOR, id);
+    private void setCollarColor(int color) {
+        this.entityData.set(DATA_COLLAR_COLOR, color);
     }
 
 
