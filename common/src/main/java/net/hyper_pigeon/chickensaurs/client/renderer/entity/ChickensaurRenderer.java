@@ -30,7 +30,7 @@ public class ChickensaurRenderer extends MobRenderer<Chickensaur, ChickensaurMod
 
     @Override
     public ResourceLocation getTextureLocation(Chickensaur chickensaur) {
-        if(chickensaur.getBrushAmount() <= 0) {
+        if(chickensaur.getBrushAmount() <= 0 || chickensaur.isBaby()) {
             return SCALES_LEVEL_0;
         } else if (chickensaur.getBrushAmount() == 1) {
             return SCALES_LEVEL_1;
