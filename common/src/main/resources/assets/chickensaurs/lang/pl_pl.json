@@ -21,5 +21,10 @@
   "sounds.chickensaurs.chickensaur_idle_two": "Kurozaur gdacze",
   "sounds.chickensaurs.chickensaur_step_one": "Kroki",
   "sounds.chickensaurs.chickensaur_step_two": "Kroki",
-  "sounds.chickensaurs.chickensaur_threaten": "Kurozaur zastrasza"
+  "sounds.chickensaurs.chickensaur_threaten": "Kurozaur zastrasza",
+
+  "advancements.tame_chickensaur.title": "Kostka z rosołu",
+  "advancements.tame_chickensaur.description": "Oswój małego kurozaura kośćmi",
+  "advancements.brush_chickensaur.title": "Żelazna nioska",
+  "advancements.brush_chickensaur.description": "Otrzymaj bryłki żelaza z kurozaura za pomocą pędzla"
 }

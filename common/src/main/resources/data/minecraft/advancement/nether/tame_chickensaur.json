@@ -1,0 +1,24 @@
+{
+  "display": {
+    "icon": {
+      "id": "chickensaurs:chickensaur_egg"
+    },
+    "title": {
+      "translate": "advancements.tame_chickensaur.title"
+    },
+    "description": {
+      "translate": "advancements.tame_chickensaur.description"
+    }
+  },
+  "parent": "minecraft:nether/root",
+  "criteria": {
+    "tame": {
+      "trigger": "minecraft:tame_animal",
+      "conditions": {
+        "entity": {
+          "type": "chickensaurs:chickensaur"
+        }
+      }
+    }
+  }
+}
