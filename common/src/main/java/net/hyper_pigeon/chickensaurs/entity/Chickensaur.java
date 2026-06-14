@@ -96,11 +96,10 @@ public class Chickensaur extends TamableAnimal implements SmartBrainOwner<Chicke
     public float oFlap;
     public float flapping = 1.0F;
     private float nextFlap = 1.0F;
-    public int shedTime;
 
     private static final Vec3i ITEM_PICKUP_RANGE_EXPANDER = new Vec3i(1,1,1);
     private static final int MAX_BRUSH_AMOUNT = 3;
-    private static final int REGEN_SCALE_TIME = 1000;
+    private static final int REGEN_SCALE_TIME = 2000;
 
     private static final EntityDataAccessor<Boolean> INTIMIDATING = SynchedEntityData.defineId(Chickensaur.class, EntityDataSerializers.BOOLEAN);
     private static final EntityDataAccessor<Integer> INTIMIDATING_TICKS = SynchedEntityData.defineId(Chickensaur.class, EntityDataSerializers.INT);
@@ -123,7 +122,6 @@ public class Chickensaur extends TamableAnimal implements SmartBrainOwner<Chicke
 
     public Chickensaur(EntityType<? extends TamableAnimal> pEntityType, Level pLevel) {
         super(pEntityType, pLevel);
-        this.shedTime = this.random.nextInt(3000) + 3000;
         this.setPathfindingMalus(PathType.DANGER_FIRE, 0.0F);
         this.setPathfindingMalus(PathType.DAMAGE_FIRE, -1.0F);
     }
@@ -137,7 +135,7 @@ public class Chickensaur extends TamableAnimal implements SmartBrainOwner<Chicke
         pBuilder.define(SADDLED, false);
         pBuilder.define(BRUSH_AMOUNT,MAX_BRUSH_AMOUNT);
         pBuilder.define(REGEN_SCALES_TICKS, 0);
-        pBuilder.define(DATA_COLLAR_COLOR, DyeColor.WHITE.getId());
+        pBuilder.define(DATA_COLLAR_COLOR, DyeColor.RED.getTextureDiffuseColor());
         pBuilder.define(PICKING_UP_ITEM, false);
     }
 
@@ -173,12 +171,6 @@ public class Chickensaur extends TamableAnimal implements SmartBrainOwner<Chicke
         }
 
         this.flap += this.flapping * 2.0F;
-        if (!this.level().isClientSide && this.isAlive() && !this.isBaby() &&  --this.shedTime <= 0) {
-            this.playSound(SoundEvents.CHICKEN_EGG, 1.0F, (this.random.nextFloat() - this.random.nextFloat()) * 0.2F + 1.0F);
-            this.spawnAtLocation(Items.IRON_NUGGET);
-            this.gameEvent(GameEvent.ENTITY_PLACE);
-            this.shedTime = this.random.nextInt(6000) + 6000;
-        }
 
         if(isIntimidating()) {
             if(this.level().isClientSide) {
@@ -220,9 +212,9 @@ public class Chickensaur extends TamableAnimal implements SmartBrainOwner<Chicke
         }
 
 
-        if(getBrushAmount() <= 0) {
+        if(getBrushAmount() < MAX_BRUSH_AMOUNT) {
             if(getRegenScaleTicks() > REGEN_SCALE_TIME) {
-                setBrushAmount(MAX_BRUSH_AMOUNT);
+                setBrushAmount(getBrushAmount()+1);
                 setRegenScalesTicks(0);
             }
             else {
@@ -322,11 +314,29 @@ public class Chickensaur extends TamableAnimal implements SmartBrainOwner<Chicke
         return aABB.inflate(0.6, 0.1, 0.6);
     }
 
+    public boolean brush(ItemStack itemstack) {
+        if (itemstack.is(Items.BRUSH) && this.brushOffIronNuggets()) {
+            level().playSound(null, this.getX(), this.getY(), this.getZ(), SoundRegistry.BRUSH.get(), SoundSource.NEUTRAL, 1.0F, 1.0F + (level().random.nextFloat() - level().random.nextFloat()) * 0.4F);
+            return true;
+        }
+
+        return false;
+    }
+
+    public boolean brush(ItemStack itemstack, Player pPlayer, InteractionHand pHand) {
+        if (itemstack.is(Items.BRUSH) && this.brushOffIronNuggets()) {
+            itemstack.hurtAndBreak(16, pPlayer, getSlotForHand(pHand));
+            level().playSound(null, this.getX(), this.getY(), this.getZ(), SoundRegistry.BRUSH.get(), SoundSource.NEUTRAL, 1.0F, 1.0F + (level().random.nextFloat() - level().random.nextFloat()) * 0.4F);
+            return true;
+        }
+
+        return false;
+    }
+
     public InteractionResult mobInteract(Player pPlayer, InteractionHand pHand) {
         ItemStack itemstack = pPlayer.getItemInHand(pHand);
-        if (itemstack.is(Items.BRUSH) && this.brushOffIronNuggets()) {
-            itemstack.hurtAndBreak(24, pPlayer, getSlotForHand(pHand));
-            level().playSound(null,this.getX(), this.getY(), this.getZ(), SoundRegistry.BRUSH.get(), SoundSource.NEUTRAL, 1.0F, 1.0F + (level().random.nextFloat() - level().random.nextFloat()) * 0.4F);
+
+        if (this.brush(itemstack, pPlayer, pHand)) {
             return InteractionResult.sidedSuccess(this.level().isClientSide);
         }
         else if(canTame()) {
@@ -381,12 +391,8 @@ public class Chickensaur extends TamableAnimal implements SmartBrainOwner<Chicke
         return this.entityData.get(DATA_COLLAR_COLOR);
     }
 
-    private void setCollarColor(DyeColor pCollarColor) {
-        this.entityData.set(DATA_COLLAR_COLOR, pCollarColor.getId());
-    }
-
-    private void setCollarColor(int id) {
-        this.entityData.set(DATA_COLLAR_COLOR, id);
+    private void setCollarColor(int color) {
+        this.entityData.set(DATA_COLLAR_COLOR, color);
     }
 
 
@@ -395,9 +401,11 @@ public class Chickensaur extends TamableAnimal implements SmartBrainOwner<Chicke
         if (this.isBaby() || brushAmount <= 0) {
             return false;
         } else {
-            this.spawnAtLocation(new ItemStack(Items.IRON_NUGGET));
+            for (int i = getBrushAmount(); i > 0; i--) {
+                this.spawnAtLocation(new ItemStack(Items.IRON_NUGGET, getRandom().nextIntBetweenInclusive(1,2)));
+            }
             this.gameEvent(GameEvent.ENTITY_INTERACT);
-            this.setBrushAmount(brushAmount-1);
+            this.setBrushAmount(0);
             return true;
         }
     }
@@ -434,7 +442,7 @@ public class Chickensaur extends TamableAnimal implements SmartBrainOwner<Chicke
         BlockPos blockPos = this.getBlockPosBelowThatAffectsMyMovement();
         BlockState blockState = this.level().getBlockState(blockPos);
         if(blockState.is(BlockTags.SOUL_SPEED_BLOCKS)){
-            return 1.3F;
+            return 1.35F;
         }
         return super.getBlockSpeedFactor();
     }
@@ -621,7 +629,7 @@ public class Chickensaur extends TamableAnimal implements SmartBrainOwner<Chicke
                         new BreedWithPartner<Chickensaur>(),
                         new OneRandomBehaviour(
                                 new SetRandomLookTarget<Chickensaur>(),
-                                new SetRandomWalkTarget<Chickensaur>().setRadius(5).speedModifier(0.75F).cooldownFor((entity) -> 150),
+                                new SetRandomWalkTarget<Chickensaur>().setRadius(5).speedModifier(0.6F).cooldownFor((entity) -> 150),
                                 new Idle<>().runFor(entity -> entity.getRandom().nextIntBetweenInclusive(30,60))
                         )
                 )
@@ -644,7 +652,7 @@ public class Chickensaur extends TamableAnimal implements SmartBrainOwner<Chicke
     }
 
     public static AttributeSupplier.Builder createAttributes() {
-        return Mob.createMobAttributes().add(Attributes.MOVEMENT_SPEED, 0.37500001192092896)
+        return Mob.createMobAttributes().add(Attributes.MOVEMENT_SPEED, 0.28)
                 .add(Attributes.MAX_HEALTH, 25.0).add(Attributes.ATTACK_DAMAGE, 8.0)
                 .add(Attributes.ARMOR, 12F)
                 .add(Attributes.FOLLOW_RANGE,16F);
@@ -732,7 +740,7 @@ public class Chickensaur extends TamableAnimal implements SmartBrainOwner<Chicke
         double d1 = this.getBoundingBox().minY;
         double d2 = this.getZ() + pDirection.z;
         BlockPos.MutableBlockPos blockpos$mutableblockpos = new BlockPos.MutableBlockPos();
-        UnmodifiableIterator var10 = pPassenger.getDismountPoses().iterator();
+        UnmodifiableIterator<Pose> var10 = pPassenger.getDismountPoses().iterator();
 
         while(var10.hasNext()) {
             Pose pose = (Pose)var10.next();

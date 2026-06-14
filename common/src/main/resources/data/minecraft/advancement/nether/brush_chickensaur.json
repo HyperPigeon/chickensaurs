@@ -1,0 +1,27 @@
+{
+  "display": {
+    "icon": {
+      "id": "minecraft:iron_nugget"
+    },
+    "title": {
+      "translate": "advancements.brush_chickensaur.title"
+    },
+    "description": {
+      "translate": "advancements.brush_chickensaur.description"
+    }
+  },
+  "parent": "minecraft:nether/tame_chickensaur",
+  "criteria": {
+    "tame": {
+      "trigger": "minecraft:player_interacted_with_entity",
+      "conditions": {
+        "item": {
+          "items": "minecraft:brush"
+        },
+        "entity": {
+          "type": "chickensaurs:chickensaur"
+        }
+      }
+    }
+  }
+}

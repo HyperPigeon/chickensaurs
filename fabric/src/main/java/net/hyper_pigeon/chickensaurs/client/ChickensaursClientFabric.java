@@ -4,15 +4,16 @@ import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.rendering.v1.EntityModelLayerRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry;
 import net.hyper_pigeon.chickensaurs.client.model.ChickensaurModel;
-import net.minecraft.client.renderer.blockentity.BlockEntityRenderers;
 
 public class ChickensaursClientFabric implements ClientModInitializer {
     @Override
     public void onInitializeClient() {
-        ChickensaursClient.registerRenderers(EntityRendererRegistry::register, BlockEntityRenderers::register);
+        ChickensaursClient.registerRenderers(EntityRendererRegistry::register);
         EntityModelLayerRegistry.registerModelLayer(ChickensaurModel.LAYER_LOCATION, ChickensaurModel::createBodyLayer);
         EntityModelLayerRegistry.registerModelLayer(ChickensaurModel.SADDLE_LAYER_LOCATION, ChickensaurModel::createBodyLayer);
-        EntityModelLayerRegistry.registerModelLayer(ChickensaurModel.BRUSHED_LAYER_LOCATION, ChickensaurModel::createBodyLayer);
+        EntityModelLayerRegistry.registerModelLayer(ChickensaurModel.SCALE_LEVEL_0_LOCATION, ChickensaurModel::createBodyLayer);
+        EntityModelLayerRegistry.registerModelLayer(ChickensaurModel.SCALE_LEVEL_1_LOCATION, ChickensaurModel::createBodyLayer);
+        EntityModelLayerRegistry.registerModelLayer(ChickensaurModel.SCALE_LEVEL_2_LOCATION, ChickensaurModel::createBodyLayer);
         EntityModelLayerRegistry.registerModelLayer(ChickensaurModel.BAND_LAYER_LOCATION, ChickensaurModel::createBodyLayer);
     }
 }

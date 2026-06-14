@@ -25,7 +25,7 @@ public class ChickensaurBandLayer extends RenderLayer<Chickensaur, ChickensaurMo
         if (chickensaur.hasOwner() && !chickensaur.isInvisible()) {
             int color = chickensaur.getCollarColor();
             VertexConsumer vertexconsumer = multiBufferSource.getBuffer(RenderType.entityCutoutNoCull(BAND_LOCATION));
-            ((ChickensaurModel)this.getParentModel()).renderToBuffer(poseStack, vertexconsumer, i, OverlayTexture.NO_OVERLAY, color);
+            this.getParentModel().renderToBuffer(poseStack, vertexconsumer, i, OverlayTexture.NO_OVERLAY, color);
         }
     }
 }

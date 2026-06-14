@@ -14,7 +14,6 @@
   "tag.chickensaurs.items.chickensaur_food": "Chickensaur Food",
   "tag.chickensaurs.worldgen.biome.chickensaur_spawn_biomes": "Chickensaurs spawn in",
 
-
   "sounds.chickensaurs.chickensaur_brush": "Brushing Chickensaur",
   "sounds.chickensaurs.chickensaur_hurt_one": "Chickensaur hurt",
   "sounds.chickensaurs.chickensaur_hurt_two": "Chickensaur dies",
@@ -22,6 +21,10 @@
   "sounds.chickensaurs.chickensaur_idle_two": "Chickensaur clucks",
   "sounds.chickensaurs.chickensaur_step_one": "Footsteps",
   "sounds.chickensaurs.chickensaur_step_two": "Footsteps",
-  "sounds.chickensaurs.chickensaur_threaten": "Chickensaur threatens intruder"
+  "sounds.chickensaurs.chickensaur_threaten": "Chickensaur threatens intruder",
 
+  "advancements.tame_chickensaur.title": "Or So Help Me",
+  "advancements.tame_chickensaur.description": "Tame a baby chickensaur with bones",
+  "advancements.brush_chickensaur.title": "Iron Efficient",
+  "advancements.brush_chickensaur.description": "Brush off a chickensaur's iron scales"
 }

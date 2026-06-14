@@ -17,14 +17,16 @@ import net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent;
 public class ChickensaursNeoForgeClient {
     @SubscribeEvent
     public static void registerRenderers(final EntityRenderersEvent.RegisterRenderers event) {
-        ChickensaursClient.registerRenderers(event::registerEntityRenderer, event::registerBlockEntityRenderer);
+        ChickensaursClient.registerRenderers(event::registerEntityRenderer);
     }
 
     @SubscribeEvent
     public static void registerEntityLayers(EntityRenderersEvent.RegisterLayerDefinitions event) {
         event.registerLayerDefinition(ChickensaurModel.LAYER_LOCATION, ChickensaurModel::createBodyLayer);
         event.registerLayerDefinition(ChickensaurModel.SADDLE_LAYER_LOCATION, ChickensaurModel::createBodyLayer);
-        event.registerLayerDefinition(ChickensaurModel.BRUSHED_LAYER_LOCATION, ChickensaurModel::createBodyLayer);
+        event.registerLayerDefinition(ChickensaurModel.SCALE_LEVEL_0_LOCATION, ChickensaurModel::createBodyLayer);
+        event.registerLayerDefinition(ChickensaurModel.SCALE_LEVEL_1_LOCATION, ChickensaurModel::createBodyLayer);
+        event.registerLayerDefinition(ChickensaurModel.SCALE_LEVEL_2_LOCATION, ChickensaurModel::createBodyLayer);
         event.registerLayerDefinition(ChickensaurModel.BAND_LAYER_LOCATION, ChickensaurModel::createBodyLayer);
     }
 
